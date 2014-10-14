@@ -11,15 +11,15 @@
       <arg name="value" type="v" direction="in"/>
     </method>
     <method name="GetTechnologies">
-      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QMap&lt;QDBusObjectPath, QVariantMap&gt;"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QList&lt;QPair&lt;QDBusObjectPath, QVariantMap&gt; &gt;"/>
       <arg name="technologies" type="a(oa{sv})" direction="out"/>
     </method>
    <method name="GetServices">
-     <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QMap&lt;QDBusObjectPath, QVariantMap&gt;"/>  
+     <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QList&lt;QPair&lt;QDBusObjectPath, QVariantMap&gt; &gt;"/>
       <arg name="services" type="a(oa{sv})" direction="out"/>
     </method>
      <method name="GetPeers">
-      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QMap&lt;QDBusObjectPath, QVariantMap&gt;"/>  
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QList&lt;QPair&lt;QDBusObjectPath, QVariantMap&gt; &gt;"/>
       <arg name="peers" type="a(oa{sv})" direction="out"/>
     </method>
     <method name="RegisterAgent">
@@ -67,12 +67,12 @@
       <arg name="path" type="o"/>
     </signal>
     <signal name="ServicesChanged">
-      <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QMap&lt;QDBusObjectPath, QVariantMap&gt;"/>  
+      <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QList&lt;QPair&lt;QDBusObjectPath, QVariantMap&gt; &gt;"/>
       <arg name="changed" type="a(oa{sv})"/>
       <arg name="removed" type="ao"/>
     </signal>
     <signal name="PeersChanged">
-      <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QMap&lt;QDBusObjectPath, QVariantMap&gt;"/>  
+      <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QList&lt;QPair&lt;QDBusObjectPath, QVariantMap&gt; &gt;"/>
       <arg name="changed" type="a(oa{sv})"/>
       <arg name="removed" type="ao"/>
     </signal>

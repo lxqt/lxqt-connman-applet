@@ -8,6 +8,7 @@ endif (NOT CMAKE_BUILD_TYPE)
 
 
 set(HDRS
+    dbus_types.h
 )
 
 set(SRCS
