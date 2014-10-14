@@ -2,6 +2,7 @@
 #define SYSTEMTRAY_H
 
 #include <QSystemTrayIcon>
+#include "net.connman.Manager.h"
 
 class SystemTray : public QSystemTrayIcon
 {
