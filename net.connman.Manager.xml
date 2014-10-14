@@ -14,10 +14,6 @@
       <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QMap&lt;QDBusObjectPath, QVariantMap&gt;"/>
       <arg name="technologies" type="a(oa{sv})" direction="out"/>
     </method>
-   <method name="RemoveProvider">
-      <arg name="provider" type="o" direction="in"/>
-      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
-    </method>
    <method name="GetServices">
      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QMap&lt;QDBusObjectPath, QVariantMap&gt;"/>  
       <arg name="services" type="a(oa{sv})" direction="out"/>
@@ -25,12 +21,6 @@
      <method name="GetPeers">
       <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QMap&lt;QDBusObjectPath, QVariantMap&gt;"/>  
       <arg name="peers" type="a(oa{sv})" direction="out"/>
-    </method>
-   <method name="ConnectProvider">
-      <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap"/>  
-      <arg name="provider" type="a{sv}" direction="in"/>
-      <arg name="path" type="o" direction="out"/>
-      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
     </method>
     <method name="RegisterAgent">
       <arg name="path" type="o" direction="in"/>

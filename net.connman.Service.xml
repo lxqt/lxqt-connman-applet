@@ -7,11 +7,6 @@
     </method>
   </interface>
   <interface name="net.connman.Service">
-    <method name="GetProperties">
-      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMap"/>
-      <arg name="properties" type="a{sv}" direction="out"/>
-      <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
-    </method>
     <method name="SetProperty">
       <arg name="name" type="s" direction="in"/>
       <arg name="value" type="v" direction="in"/>
