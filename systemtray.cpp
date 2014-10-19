@@ -4,82 +4,57 @@
 #include <QStringList>
 #include <QActionGroup>
 
+#include "manager.h"
+#include "technology.h"
+
 #include "systemtray.h"
 
 
-SystemTray::SystemTray(QObject *parent) :
-    QSystemTrayIcon(parent)
+SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent), technologyEntries(this), serviceEntries(this)
 {
-    registerDBusTypes();
-//    QIcon::setThemeName("Oxygen");
+    Manager::instance();
+    QIcon::setThemeName("Oxygen");
     qDebug() << "Setting icon";
     setIcon(QIcon(":/icons/network-wired.png"));
-    buildMenu();
 
-    qDebug() << "Calling connman";
+    technologyEntries.setExclusive(false);
 
-    QString service("net.connman");
-    QString objectPath = "/";
-
-    NetConnmanManagerInterface ni(service, objectPath, QDBusConnection::systemBus());
-/*    QDBusPendingReply<QMap<QDBusObjectPath, QVariantMap> > pr = ni.GetTechnologies();
-    //qDebug() << "pendingreply: "  << pr;
-
-    QDBusMessage m = pr.reply();
-    qDebug() << "Signature: " << m.signature();
-
-    QMap<QDBusObjectPath, QVariantMap> map = pr.value();
-    foreach (QDBusObjectPath path, map.keys()) {
-        qDebug() << path.path();
-    }*/
-    QVariantMap props = ni.GetProperties();
-
-    qDebug() << "props: " << props;
-
-    ObjectPropertiesList opm = ni.GetTechnologies();
-    QPair<QDBusObjectPath, QVariantMap> pair;
-    foreach (pair, opm) {
-        qDebug() << pair.first.path() << ":" << pair.second;
-    }
+    setContextMenu(new QMenu());
+    connect(contextMenu(), SIGNAL(aboutToShow()), this, SLOT(buildMenu()));
 }
 
-void SystemTray::registerDBusTypes() {
-    qDBusRegisterMetaType<ObjectProperties>();
-    qDBusRegisterMetaType<ObjectPropertiesList>();
-}
 
 void SystemTray::buildMenu()
 {
-    setContextMenu(new QMenu());
-    addTechnologies();
-    contextMenu()->addSeparator();
-    addServices();
+    contextMenu()->clear();
+    contextMenu()->addSection("Technologies:");
+    foreach (TechnologyPtr tech, Technology::technologies())
+    {
+        QAction *action = contextMenu()->addAction(tech->name());
+        action->setCheckable(true);
+        action->setChecked(tech->powered());
+        technologyEntries.addAction(action);
+        action->setData(QString("technology:") + tech->path().path());
+    }
+    contextMenu()->addSection("Services:");
+    foreach (ServicePtr service, Service::services())
+    {
+        QAction *action = contextMenu()->addAction(service->name());
+        action->setCheckable(true);
+        action->setChecked(QString("online") == service->state());
+        serviceEntries.addAction(action);
+        action->setData(QString("service:") + service->path().path());
+    }
+
 }
 
 
-void SystemTray::addTechnologies()
+void SystemTray::onTechnologyClicked(QAction *action)
 {
-    QStringList  techs;
-    techs << "Wired" << "Wifi" << "Bluetooth";
-
-    foreach (QString tech, techs)
-    {
-        QAction *action = contextMenu()->addAction(tech);
-        action->setCheckable(true);
-    }
+    // TODO
 }
 
-void SystemTray::addServices()
+void SystemTray::onServiceClicked(QAction *action)
 {
-    QStringList services;
-    services << "Essid1" << "Essid2" << "Essid3";
-
-    QActionGroup *actionGroup = new QActionGroup(this);
-
-    foreach(QString service, services)
-    {
-        QAction *action = contextMenu()->addAction(service);
-        action->setActionGroup(actionGroup);
-        action->setCheckable(true);
-    }
+    // TODO
 }

@@ -14,10 +14,16 @@ set(HDRS
 set(SRCS
     main.cpp
     systemtray.cpp
+    manager.cpp
+    technology.cpp
+    service.cpp
 )
 
 set(MOCS
    systemtray.h
+   manager.h
+   service.h
+   technology.h
 )
 
 
@@ -36,8 +42,11 @@ find_package(Qt5Core REQUIRED QUIET)
 qt5_wrap_cpp(MOCS_GENERATED ${MOCS})
 qt5_wrap_ui(UIS_GENERATED ${UIS})
 qt5_add_resources(QRCS_GENERATED ${QRCS})
+
+set_source_files_properties(net.connman.Manager.xml PROPERTIES INCLUDE dbus_types.h)
 qt5_add_dbus_interface(DBUS_GENERATED net.connman.Manager.xml net.connman.Manager)
 qt5_add_dbus_interface(DBUS_GENERATED net.connman.Service.xml net.connman.Service)
+qt5_add_dbus_interface(DBUS_GENERATED net.connman.Technology.xml net.connman.Technology)
 
 message(INFO "DBUS_GENERATED: ${DBUS_GENERATED}")
 
@@ -64,6 +73,7 @@ set(APP_SHARE_DIR share/lxqt/${PROJECT_NAME})
 
 add_executable(${PROJECT_NAME}
    ${SRCS}
+   ${HDRS}
    ${QRCS_GENERATED}
    ${MOCS_GENERATED}
    ${DBUS_GENERATED}
