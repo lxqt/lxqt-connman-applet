@@ -33,7 +33,6 @@ void Service::mergeServices(ObjectPropertiesList changed, QList<QDBusObjectPath>
     }
 }
 
-
 Service::Service(QDBusObjectPath path) : NetConnmanServiceInterface("net.connman", path.path(), QDBusConnection::systemBus()), mPath(path)
 {
     connect(this, SIGNAL(PropertyChanged(QString,QDBusVariant)), this, SLOT(onPropertyChange(QString,QDBusVariant)));

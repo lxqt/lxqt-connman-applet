@@ -10,6 +10,7 @@
 class Service;
 
 typedef QSharedPointer<Service> ServicePtr;
+Q_DECLARE_METATYPE(ServicePtr)
 
 class Service : public NetConnmanServiceInterface
 {
