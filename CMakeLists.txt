@@ -12,11 +12,13 @@ set(HDRS
 )
 
 set(SRCS
-    applet_main.cpp
+    main.cpp
     systemtray.cpp
     manager.cpp
     technology.cpp
     service.cpp
+    agent.cpp
+    agent_adaptor.cpp
 )
 
 set(MOCS
@@ -24,6 +26,8 @@ set(MOCS
    manager.h
    service.h
    technology.h
+   agent.h
+   agent_adaptor.h
 )
 
 

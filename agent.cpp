@@ -1,5 +1,6 @@
 #include "agent.h"
-#include "../applet/net.connman.Manager.h"
+#include "agent_adaptor.h"
+#include "net.connman.Manager.h"
 
 #define DBUS_PATH "/org/lxqt/lxqt-connman-agent"
 
