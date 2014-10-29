@@ -1,16 +1,17 @@
+#include <QDBusObjectPath>
 #include "agent.h"
 #include "agent_adaptor.h"
 #include "net.connman.Manager.h"
 
-#define DBUS_PATH "/org/lxqt/lxqt-connman-agent"
-
-Agent::Agent(int argc, char **argv) : QApplication(argc, argv)
+Agent::Agent() : QObject(), path("/org/lxqt/lxqt_connman_agent")
 {
+    qDebug() << "After setPath, path:" << path.path();
     new AgentAdaptor(this);
-    QDBusConnection::systemBus().registerObject(DBUS_PATH, this);
-
+    qDebug() << "Register object";
+    QDBusConnection::systemBus().registerObject(path.path(), this);
 
     NetConnmanManagerInterface netConnmanManagerInterface("net.connman", "/", QDBusConnection::systemBus());
-    netConnmanManagerInterface.RegisterAgent(QDBusObjectPath(DBUS_PATH));
+    qDebug() << "Register agent on" << path.path();
+    netConnmanManagerInterface.RegisterAgent(path);
 
-}
+ }

@@ -1,18 +1,16 @@
 #ifndef AGENT_H
 #define AGENT_H
 
-#include <QApplication>
+#include <QDBusObjectPath>
 
-class Agent : public QApplication
+class Agent : public QObject
 {
     Q_OBJECT
 public:
-    explicit Agent(int argc, char** argv);
+    explicit Agent();
 
-signals:
-
-public slots:
-
+private:
+    QDBusObjectPath path;
 };
 
 #endif // AGENT_H

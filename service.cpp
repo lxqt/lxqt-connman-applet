@@ -41,6 +41,5 @@ Service::Service(QDBusObjectPath path) : NetConnmanServiceInterface("net.connman
 
 void Service::onPropertyChange(QString key, QDBusVariant newValue)
 {
-    qDebug() << mPath.path() << "propertychange:" << key << "->" << newValue.variant();
     serviceProperties()[mPath.path()][key] = newValue.variant();
 }

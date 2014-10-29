@@ -35,12 +35,10 @@ Technology::Technology(QDBusObjectPath path, QVariantMap properties) :
 
 void Technology::onPropertyChange(QString key, QDBusVariant newValue)
 {
-    qDebug() << mPath.path() << "propertyChanged:" << key << "->" << newValue.variant();
     bool shouldScan = key == "Powered" && !mProperties.value(key, false).toBool() && newValue.variant().toBool();
     mProperties.insert(key, newValue.variant());
 
     if (shouldScan) {
-        qDebug() << "Doing scan on" << mPath.path();
         Scan();
     }
 }
