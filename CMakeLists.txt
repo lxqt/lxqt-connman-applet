@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 3.0 )
 project(${PROJECT_NAME})
 
 if(NOT CMAKE_BUILD_TYPE)
-    set( CMAKE_BUILD_TYPE Release )
+    set( CMAKE_BUILD_TYPE Debug )
 endif (NOT CMAKE_BUILD_TYPE)
 
 
@@ -18,7 +18,10 @@ set(SRCS
     technology.cpp
     service.cpp
     agent.cpp
-    agent_adaptor.cpp
+    net.connman.Agent.xml
+    net.connman.Manager.xml
+    net.connman.Service.xml
+    net.connman.Technology.xml
 )
 
 set(MOCS
@@ -27,7 +30,6 @@ set(MOCS
    service.h
    technology.h
    agent.h
-   agent_adaptor.h
 )
 
 
@@ -46,6 +48,8 @@ find_package(Qt5Core REQUIRED QUIET)
 qt5_wrap_cpp(MOCS_GENERATED ${MOCS})
 qt5_wrap_ui(UIS_GENERATED ${UIS})
 qt5_add_resources(QRCS_GENERATED ${QRCS})
+
+qt5_add_dbus_adaptor(DBUS_GENERATED net.connman.Agent.xml agent.h Agent)
 
 set_source_files_properties(net.connman.Manager.xml PROPERTIES INCLUDE dbus_types.h)
 qt5_add_dbus_interface(DBUS_GENERATED net.connman.Manager.xml net.connman.Manager)
@@ -67,7 +71,7 @@ set(APP_SHARE_DIR share/lxqt/${PROJECT_NAME})
 #************************************************
 
 
-# Translations **********************************
+# Translations **********************************lxqt-powermanagement/src/CMakeLists.txt:
 #lxqt_translate_desktop(DESKTOP_FILES
 #    SOURCES
 #        resources/lxqt-connman-applet.desktop.in

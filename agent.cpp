@@ -1,6 +1,6 @@
 #include <QDBusObjectPath>
 #include "agent.h"
-#include "agent_adaptor.h"
+#include "agentadaptor.h"
 #include "net.connman.Manager.h"
 
 Agent::Agent() : QObject(), path("/org/lxqt/lxqt_connman_agent")
