@@ -18,6 +18,8 @@ set(SRCS
     technology.cpp
     service.cpp
     agent.cpp
+    dialog.cpp
+    dialog.ui
     net.connman.Agent.xml
     net.connman.Manager.xml
     net.connman.Service.xml
@@ -25,15 +27,17 @@ set(SRCS
 )
 
 set(MOCS
-   systemtray.h
-   manager.h
-   service.h
-   technology.h
-   agent.h
+    systemtray.h
+    manager.h
+    service.h
+    technology.h
+    agent.h
+    dialog.h
 )
 
 
 set(UIS
+    dialog.ui
 )
 
 set(QRCS
