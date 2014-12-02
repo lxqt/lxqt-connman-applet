@@ -11,6 +11,7 @@ set(HDRS
     dbus_types.h
 )
 
+
 set(SRCS
     main.cpp
     systemtray.cpp

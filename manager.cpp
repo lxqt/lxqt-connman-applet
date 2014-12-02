@@ -5,47 +5,116 @@
 
 Manager& Manager::instance()
 {
-    static bool initialized = false;
-    if (! initialized)
+    static Manager *instance = 0;
+    if (! instance)
     {
         qDBusRegisterMetaType<ObjectProperties>();
         qDBusRegisterMetaType<ObjectPropertiesList>();
         qDBusRegisterMetaType<QList<QDBusObjectPath> >();
-        initialized = true;
+        instance = new Manager();
     }
 
-    static Manager _instance;
-    return _instance;
+    return *instance;
 }
+
 
 Manager::Manager() :
     NetConnmanManagerInterface("net.connman", "/", QDBusConnection::systemBus())
 {
-    qDebug() << connect(this, SIGNAL(ServicesChanged(ObjectPropertiesList,QList<QDBusObjectPath>)), this, SLOT(onServicesChanged(ObjectPropertiesList,QList<QDBusObjectPath>)));
+    qDebug() << "1";
+    connect(this, SIGNAL(ServicesChanged(ObjectPropertiesList,QList<QDBusObjectPath>)), this, SLOT(onServicesChanged(ObjectPropertiesList,QList<QDBusObjectPath>)));
 
-    qDebug() << "Getting technologies...";
+    qDebug() << "2";
     foreach (ObjectProperties op, ObjectPropertiesList(GetTechnologies()))
     {
-        Technology::addTechnology(op.first, op.second);
+        onTechnologyAdded(op.first, op.second);
     }
 
-    Service::mergeServices(ObjectPropertiesList(GetServices()), QList<QDBusObjectPath>());
+    qDebug() << "3";
+    QDBusServiceWatcher *watcher = new QDBusServiceWatcher("net.connman", QDBusConnection::systemBus(),
+                                                           QDBusServiceWatcher::WatchForRegistration | QDBusServiceWatcher::WatchForUnregistration);
+    qDebug() << "4";
+    connect(watcher, SIGNAL(serviceRegistered(QString)), this, SLOT(onConnmanStarted(QString)));
+    connect(watcher, SIGNAL(serviceUnregistered(QString)), this, SLOT(onConnmanStopped(QString)));
+
+
+    qDebug() << "5";
+    onServicesChanged(ObjectPropertiesList(GetServices()), QList<QDBusObjectPath>());
+    qDebug() << "6";
+
 }
 
+void Manager::onConnmanStarted(QString serviceName)
+{
+    qDebug() << "Connman started:" << serviceName;
+}
+
+void Manager::onConnmanStopped(QString serviceName)
+{
+    qDebug() << "Connman stopped" << serviceName;
+}
 
 void Manager::onTechnologyAdded(QDBusObjectPath path, QVariantMap properties)
 {
-    Technology::addTechnology(path, properties);
+    qDebug() << "Technology added:" << path.path();
+    mTechnologyMap[path] = new Technology(path, properties);
 }
 
 void Manager::onTechnologyRemoved(QDBusObjectPath path)
 {
-    Technology::removeTechnology(path);
+    if (mTechnologyMap.contains(path))
+    {
+        qDebug() << "removing:" << path.path();
+        mTechnologyMap.take(path)->deleteLater();
+    }
 }
-
 
 void Manager::onServicesChanged(ObjectPropertiesList changed, QList<QDBusObjectPath> removed)
 {
-    Q_UNUSED(removed);
-    Service::mergeServices(changed, removed);
+
+    qDebug() << "Services changed";
+
+    mServiceList.clear();
+
+    foreach (QDBusObjectPath pathOfRemovedService, removed)
+    {
+        if (mServiceMap.contains(pathOfRemovedService)) {
+            qDebug() << "Removing" << *service(pathOfRemovedService);
+            //mServiceMap.take(pathOfRemovedService)->deleteLater();
+            mServiceMap[pathOfRemovedService]->deleted = true;
+        }
+
+    }
+
+    qDebug() << "Merging" << changed.size();
+    foreach (ObjectProperties objectProperties, changed)
+    {
+        QDBusObjectPath servicePath = objectProperties.first;
+        QVariantMap serviceProperties = objectProperties.second;
+
+        qDebug() << servicePath.path();
+
+        if (!mServiceMap.contains(servicePath))
+        {
+            Service *service = new Service(servicePath);
+            qDebug() << "Adding" << *service;
+            mServiceMap.insert(servicePath, service);
+        }
+        else
+        {
+            qDebug() << "Was there..";
+        }
+
+        Service* service = mServiceMap[servicePath];
+        qDebug() << "Setting properties on " << service;
+        foreach (QString propertyKey, serviceProperties.keys())
+        {
+            qDebug() << "Setting" << propertyKey << ":" << serviceProperties[propertyKey];
+            service->setProperty(propertyKey, serviceProperties[propertyKey]);
+        }
+
+        qDebug() << "Appending" << servicePath.path();
+        mServiceList.append(service);
+    }
+    qDebug() << "Merging done";
 }

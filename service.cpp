@@ -1,45 +1,30 @@
 #include "service.h"
 
-QList<ServicePtr>& Service::services()
-{
-    static QList<ServicePtr> _services;
-    return _services;
-}
-
-QMap<QString, QVariantMap>& Service::serviceProperties()
-{
-    static QMap<QString, QVariantMap> _serviceProperties;
-    return _serviceProperties;
-}
-
-void Service::mergeServices(ObjectPropertiesList changed, QList<QDBusObjectPath> removed)
-{
-    foreach(QDBusObjectPath path, removed)
-    {
-        serviceProperties().remove(path.path());
-    }
-
-    services().clear();
-    foreach (ObjectProperties op, changed)
-    {
-        QDBusObjectPath path = op.first;
-        QVariantMap changedProperties = op.second;
-
-        services().append(ServicePtr(new Service(op.first)));
-        foreach (QString key, changedProperties.keys())
-        {
-            serviceProperties()[path.path()].insert(key, changedProperties[key]);
-        }
-    }
-}
-
-Service::Service(QDBusObjectPath path) : NetConnmanServiceInterface("net.connman", path.path(), QDBusConnection::systemBus()), mPath(path)
+Service::Service(QDBusObjectPath path) :
+    NetConnmanServiceInterface("net.connman", path.path(), QDBusConnection::systemBus()),
+    deleted(false),
+    mPath(path),
+    mProperties()
 {
     connect(this, SIGNAL(PropertyChanged(QString,QDBusVariant)), this, SLOT(onPropertyChange(QString,QDBusVariant)));
 }
 
+void Service::setProperty(QString key, QVariant newValue)
+{
+    if (deleted) qDebug() << ">>> Setting property on deleted service" << *this;
+    mProperties[key] = newValue;
+}
 
 void Service::onPropertyChange(QString key, QDBusVariant newValue)
 {
-    serviceProperties()[mPath.path()][key] = newValue.variant();
+    if (deleted) qDebug() << ">>> Deleted service recieving signal" << *this;
+    qDebug() << "Service::onPropertyChange" << key << ":" << newValue.variant();
+    setProperty(key, newValue.variant());
+}
+
+
+QDebug operator<<(QDebug dbg, Service &service)
+{
+    dbg.nospace() << "Service(" << service.path().path() << ")";
+    return dbg.maybeSpace();
 }

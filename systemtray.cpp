@@ -11,7 +11,7 @@
 #include "systemtray.h"
 
 
-SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent), technologyEntries(this), serviceEntries(this)
+SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent), quitAction(tr("Quit"), this), technologyEntries(this), serviceEntries(this)
 {
     Manager::instance();
     QIcon::setThemeName("Oxygen");
@@ -22,6 +22,7 @@ SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent), technologyEnt
 
     setContextMenu(new QMenu());
     connect(contextMenu(), SIGNAL(aboutToShow()), this, SLOT(buildMenu()));
+    connect(&quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(&technologyEntries, SIGNAL(triggered(QAction*)), this, SLOT(onTechnologyClicked(QAction*)));
     connect(&serviceEntries, SIGNAL(triggered(QAction*)), this, SLOT(onServiceClicked(QAction*)));
 }
@@ -29,45 +30,72 @@ SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent), technologyEnt
 
 void SystemTray::buildMenu()
 {
+    qDebug() << "Building menu..." ;
     contextMenu()->clear();
-    contextMenu()->addSection("Technologies:");
-    foreach (TechnologyPtr technologyPtr, Technology::technologies())
+
+    contextMenu()->addSection("Technologies: ");
+    foreach (Technology* technology, Manager::instance().technologies())
     {
-        QAction *action = contextMenu()->addAction(technologyPtr->name());
+        QAction *action = contextMenu()->addAction(technology->name());
         action->setCheckable(true);
-        action->setChecked(technologyPtr->powered());
+        action->setChecked(technology->powered());
         technologyEntries.addAction(action);
-        action->setData(QVariant(technologyPtr));
+        action->setData(QVariant::fromValue<QDBusObjectPath>(technology->path()));
     }
-    contextMenu()->addSection("Services:");
-    foreach (ServicePtr servicePtr, Service::services())
+
+    contextMenu()->addSection("Services: ");
+    foreach (Service* service, Manager::instance().services())
     {
-        QAction *action = contextMenu()->addAction(servicePtr->name());
+        QAction *action = contextMenu()->addAction(service->name());
         action->setCheckable(true);
-        action->setChecked(QString("online") == servicePtr->state());
+        action->setChecked(QString("online") == service->state() || QString("ready") == service->state());
         serviceEntries.addAction(action);
-        action->setData(QVariant::fromValue<ServicePtr>(servicePtr));
+        action->setData(QVariant::fromValue<QDBusObjectPath>(service->path()));
     }
+
+    contextMenu()->addAction(&quitAction);
 
 }
 
 
 void SystemTray::onTechnologyClicked(QAction *action)
 {
-    TechnologyPtr technologyPtr = action->data().value<TechnologyPtr>();
-    qDebug() << technologyPtr->path().path() << "clicked";
+    QDBusObjectPath path = action->data().value<QDBusObjectPath>();
+    qDebug() << path.path() << "clicked";
+
+    Technology *technology = Manager::instance().technology(path) ;
+
+    if (! technology)
+    {
+        qWarning() << "Invalid technology clicked:" << path.path();
+        return;
+    }
+
+    technology->togglePowered();
 }
 
 void SystemTray::onServiceClicked(QAction *action)
 {
-    ServicePtr servicePtr = action->data().value<ServicePtr>();
-    qDebug() << "Into onServiceClicked, state:" << servicePtr->state();
-    if (servicePtr->state() == "idle" || servicePtr->state() == "failure") {
-        qDebug() << "Connect...";
-        servicePtr->Connect();
+    QDBusObjectPath path = action->data().value<QDBusObjectPath>();
+    Service* service = Manager::instance().service(path);
+
+    if (! service)
+    {
+        qWarning() << "Invalid service clicked:" << path.path();
+        return;
     }
-    else if (servicePtr->state() == "online") {
+
+    qDebug() << "Service" << service->name() << "clicked";
+    qDebug() << "State:" << service->state();
+
+    if (service->state() == "idle" || service->state() == "failure")
+    {
+        qDebug() << "Connect...";
+        service->Connect();
+    }
+    else if (service->state() == "online")
+    {
         qDebug() << "disconnect...";
-        servicePtr->disconnect();
+        service->disconnect();
     }
 }

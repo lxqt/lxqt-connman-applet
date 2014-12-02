@@ -22,6 +22,7 @@ private:
 
     QActionGroup technologyEntries;
     QActionGroup serviceEntries;
+    QAction quitAction;
 
 private slots:
     void buildMenu();

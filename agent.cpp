@@ -5,6 +5,7 @@
 #include "agentadaptor.h"
 #include "net.connman.Manager.h"
 #include "dialog.h"
+#include "service.h"
 
 Agent::Agent() : QObject(), path("/org/lxqt/lxqt_connman_agent")
 {
@@ -23,7 +24,7 @@ Agent::Agent() : QObject(), path("/org/lxqt/lxqt_connman_agent")
 
 void Agent::Release()
 {
-    // Nothing to do, really
+    // Nothing to do
 }
 
 void Agent::Cancel()
@@ -69,7 +70,7 @@ QVariantMap Agent::RequestPeerAuthorization(QDBusObjectPath peer, QVariantMap fi
 
 QString Agent::Introspect()
 {
-    qDebug() << "Ind i Introspect...";
+    qDebug() << "Introspect...";
     QFile xmlFile(":/interface/net.connman.Agent.xml");
     xmlFile.open(QIODevice::ReadOnly);
     QString xml(xmlFile.readAll());

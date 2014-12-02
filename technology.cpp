@@ -1,44 +1,37 @@
 #include <QDBusConnection>
 #include "technology.h"
 
-QList<TechnologyPtr>& Technology::technologies()
+void Technology::togglePowered()
 {
-    static QList<TechnologyPtr> _technologies;
-    return _technologies;
+    bool newState = !powered();
+    qDebug() << "Setting power" << newState << "on" << *this;
+
+    QDBusMessage reply = SetProperty("Powered", QDBusVariant(newState)).reply();
+    qDebug() << "reply:" << reply.errorMessage();
 }
 
-void Technology::addTechnology(QDBusObjectPath path, QVariantMap properties)
-{
-    Technology* technology = new Technology(path, properties);
-    technology->Scan();
-    technologies().append(TechnologyPtr(new Technology(path, properties)));
-}
-
-
-void Technology::removeTechnology(QDBusObjectPath path)
-{
-    for (int i = 0; i < technologies().size(); i++)
-    {
-        if (technologies().at(i)->path().path() == path.path())
-        {
-            technologies().removeAt(i);
-            break;
-        }
-    }
-}
 
 Technology::Technology(QDBusObjectPath path, QVariantMap properties) :
     NetConnmanTechnologyInterface("net.connman", path.path(), QDBusConnection::systemBus()), mPath(path), mProperties(properties)
 {
     connect(this, SIGNAL(PropertyChanged(QString,QDBusVariant)), this, SLOT(onPropertyChange(QString,QDBusVariant)));
+    Scan();
 }
 
 void Technology::onPropertyChange(QString key, QDBusVariant newValue)
 {
+    qDebug() << "Technology::onPropertyChange" << key << ":" << newValue.variant();
     bool shouldScan = key == "Powered" && !mProperties.value(key, false).toBool() && newValue.variant().toBool();
     mProperties.insert(key, newValue.variant());
 
     if (shouldScan) {
         Scan();
     }
+}
+
+
+QDebug operator <<(QDebug dbg, Technology &technology)
+{
+    dbg.nospace() << "Technology(" << technology.path().path() << ")";
+    return dbg.maybeSpace();
 }
