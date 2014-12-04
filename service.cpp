@@ -2,7 +2,6 @@
 
 Service::Service(QDBusObjectPath path) :
     NetConnmanServiceInterface("net.connman", path.path(), QDBusConnection::systemBus()),
-    deleted(false),
     mPath(path),
     mProperties()
 {
@@ -11,13 +10,11 @@ Service::Service(QDBusObjectPath path) :
 
 void Service::setProperty(QString key, QVariant newValue)
 {
-    if (deleted) qDebug() << ">>> Setting property on deleted service" << *this;
     mProperties[key] = newValue;
 }
 
 void Service::onPropertyChange(QString key, QDBusVariant newValue)
 {
-    if (deleted) qDebug() << ">>> Deleted service recieving signal" << *this;
     qDebug() << "Service::onPropertyChange" << key << ":" << newValue.variant();
     setProperty(key, newValue.variant());
 }

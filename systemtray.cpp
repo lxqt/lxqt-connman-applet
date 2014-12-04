@@ -7,17 +7,19 @@
 
 #include "manager.h"
 #include "technology.h"
+#include "connectionstate.h"
+#include "iconfinder.h"
 
 #include "systemtray.h"
 
 
-SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent), quitAction(tr("Quit"), this), technologyEntries(this), serviceEntries(this)
+SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent),
+    technologyEntries(this), serviceEntries(this), quitAction(tr("Quit"), this), trayIcon(":/icons/network-wired.png")
 {
     Manager::instance();
     QIcon::setThemeName("Oxygen");
     qDebug() << "Setting icon";
-    setIcon(QIcon(":/icons/network-wired.png"));
-
+    setConnectionIcon();
     technologyEntries.setExclusive(false);
 
     setContextMenu(new QMenu());
@@ -98,4 +100,9 @@ void SystemTray::onServiceClicked(QAction *action)
         qDebug() << "disconnect...";
         service->disconnect();
     }
+}
+
+void SystemTray::setConnectionIcon()
+{
+    setIcon(IconFinder::instance()->icon());
 }

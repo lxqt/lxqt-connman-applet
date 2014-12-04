@@ -80,10 +80,8 @@ void Manager::onServicesChanged(ObjectPropertiesList changed, QList<QDBusObjectP
     {
         if (mServiceMap.contains(pathOfRemovedService)) {
             qDebug() << "Removing" << *service(pathOfRemovedService);
-            //mServiceMap.take(pathOfRemovedService)->deleteLater();
-            mServiceMap[pathOfRemovedService]->deleted = true;
+            mServiceMap.take(pathOfRemovedService)->deleteLater();
         }
-
     }
 
     qDebug() << "Merging" << changed.size();

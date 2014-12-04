@@ -20,10 +20,9 @@ public:
     QString state() { return mProperties.value("State").toString(); }
     QString name() { return mProperties.value("Name").toString(); }
     QString type() { return mProperties.value("Type").toString(); }
+    int signalStrength() { return mProperties.value("Strength").toInt(); }
 
     void setProperty(QString key, QVariant newValue);
-
-    bool deleted;
 
 private slots:
     void onPropertyChange(QString key, QDBusVariant newValue);

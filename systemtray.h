@@ -23,11 +23,13 @@ private:
     QActionGroup technologyEntries;
     QActionGroup serviceEntries;
     QAction quitAction;
+    QIcon trayIcon;
 
 private slots:
     void buildMenu();
     void onTechnologyClicked(QAction* action);
     void onServiceClicked(QAction* action);
+    void setConnectionIcon();
 };
 
 #endif // SYSTEMTRAY_H

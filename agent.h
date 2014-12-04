@@ -16,7 +16,7 @@ public:
     void ReportError(QDBusObjectPath service, QString errorMessage);
     void ReportPeerError(QDBusObjectPath peer, QString errorMessage);
     void RequestBrowser(QDBusObjectPath service, QString url);
-    QVariantMap RequestInput(QDBusObjectPath service, QVariantMap fields);
+    QVariantMap RequestInput(QDBusObjectPath servicePath, QVariantMap fields);
     QVariantMap RequestPeerAuthorization(QDBusObjectPath peer, QVariantMap fields);
     QString Introspect();
 

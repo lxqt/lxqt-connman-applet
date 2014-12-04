@@ -20,6 +20,8 @@ set(SRCS
     service.cpp
     agent.cpp
     dialog.cpp
+    connectionstate.cpp
+    iconfinder.cpp
     dialog.ui
     net.connman.Agent.xml
     net.connman.Manager.xml
@@ -34,6 +36,8 @@ set(MOCS
     technology.h
     agent.h
     dialog.h
+    connectionstate.h
+    iconfinder.h
 )
 
 

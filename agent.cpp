@@ -6,6 +6,7 @@
 #include "net.connman.Manager.h"
 #include "dialog.h"
 #include "service.h"
+#include "manager.h"
 
 Agent::Agent() : QObject(), path("/org/lxqt/lxqt_connman_agent")
 {
@@ -47,19 +48,26 @@ void Agent::RequestBrowser(QDBusObjectPath service, QString url)
     // FIXME
 }
 
-QVariantMap Agent::RequestInput(QDBusObjectPath service, QVariantMap fields)
+QVariantMap Agent::RequestInput(QDBusObjectPath servicePath, QVariantMap fields)
 {
-    Dialog infoDialog(service.path(), fields);
+    Service *service = Manager::instance().service(servicePath);
+
+    if (!service)
+    {
+        sendErrorReply("net.connman.Agent.Error.Canceled", "Unknown service");
+        return QVariantMap();
+    }
+
+    Dialog infoDialog(service->name(), fields);
     connect(this, SIGNAL(operationCanceled()), &infoDialog, SLOT(reject()));
+
     if (Dialog::Rejected == infoDialog.exec())
     {
         sendErrorReply("net.connman.Agent.Error.Canceled", "Cancelled");
         return QVariantMap();
     }
-    else
-    {
-        return infoDialog.collectedInput();
-    }
+
+    return infoDialog.collectedInput();
 }
 
 QVariantMap Agent::RequestPeerAuthorization(QDBusObjectPath peer, QVariantMap fields)

@@ -14,6 +14,7 @@ class Manager : public NetConnmanManagerInterface
 {
     Q_OBJECT
 
+
 public:
     static Manager& instance();
 
