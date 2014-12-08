@@ -3,7 +3,7 @@
 #include "manager.h"
 #include "technology.h"
 
-Manager& Manager::instance()
+Manager *Manager::instance()
 {
     static Manager *instance = 0;
     if (! instance)
@@ -14,35 +14,32 @@ Manager& Manager::instance()
         instance = new Manager();
     }
 
-    return *instance;
+
+    return instance;
 }
 
 
 Manager::Manager() :
     NetConnmanManagerInterface("net.connman", "/", QDBusConnection::systemBus())
 {
-    qDebug() << "1";
+    mSignalStrength = 0;
+
     connect(this, SIGNAL(ServicesChanged(ObjectPropertiesList,QList<QDBusObjectPath>)), this, SLOT(onServicesChanged(ObjectPropertiesList,QList<QDBusObjectPath>)));
 
-    qDebug() << "2";
     foreach (ObjectProperties op, ObjectPropertiesList(GetTechnologies()))
     {
         onTechnologyAdded(op.first, op.second);
     }
 
-    qDebug() << "3";
     QDBusServiceWatcher *watcher = new QDBusServiceWatcher("net.connman", QDBusConnection::systemBus(),
                                                            QDBusServiceWatcher::WatchForRegistration | QDBusServiceWatcher::WatchForUnregistration);
-    qDebug() << "4";
     connect(watcher, SIGNAL(serviceRegistered(QString)), this, SLOT(onConnmanStarted(QString)));
     connect(watcher, SIGNAL(serviceUnregistered(QString)), this, SLOT(onConnmanStopped(QString)));
 
-
-    qDebug() << "5";
     onServicesChanged(ObjectPropertiesList(GetServices()), QList<QDBusObjectPath>());
-    qDebug() << "6";
 
 }
+
 
 void Manager::onConnmanStarted(QString serviceName)
 {
@@ -98,12 +95,9 @@ void Manager::onServicesChanged(ObjectPropertiesList changed, QList<QDBusObjectP
             qDebug() << "Adding" << *service;
             mServiceMap.insert(servicePath, service);
         }
-        else
-        {
-            qDebug() << "Was there..";
-        }
 
         Service* service = mServiceMap[servicePath];
+
         qDebug() << "Setting properties on " << service;
         foreach (QString propertyKey, serviceProperties.keys())
         {
@@ -115,4 +109,49 @@ void Manager::onServicesChanged(ObjectPropertiesList changed, QList<QDBusObjectP
         mServiceList.append(service);
     }
     qDebug() << "Merging done";
+
+    QSet<Service*> connectedServicesNow;
+    bool somethingChanged = false;
+
+    foreach (Service *s, services())
+    {
+        if (s->state() == "online")
+        {
+            connectedServicesNow << s;
+        }
+    }
+
+    mConnectionState = connectedServicesNow.isEmpty() ? Disconnected : Connected_Wired;
+
+    if (connectedServicesNow.size() != mConnectedServices.size())
+    {
+        somethingChanged = true;
+    }
+
+    foreach (Service *s, connectedServicesNow)
+    {
+        if (! mConnectedServices.contains(s))
+        {
+            somethingChanged = true;
+        }
+
+        if (s->type() == "wifi")
+        {
+            mConnectionState = Connected_Wireless;
+            if (s->signalStrength() != mSignalStrength)
+            {
+                somethingChanged = true;
+                mSignalStrength = s->signalStrength();
+            }
+        }
+    }
+
+
+    mConnectedServices.clear();
+    mConnectedServices.unite(connectedServicesNow);
+
+    if (somethingChanged)
+    {
+        emit connectionStateChanged();
+    }
 }

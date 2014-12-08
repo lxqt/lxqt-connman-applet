@@ -50,7 +50,7 @@ void Agent::RequestBrowser(QDBusObjectPath service, QString url)
 
 QVariantMap Agent::RequestInput(QDBusObjectPath servicePath, QVariantMap fields)
 {
-    Service *service = Manager::instance().service(servicePath);
+    Service *service = Manager::instance()->service(servicePath);
 
     if (!service)
     {

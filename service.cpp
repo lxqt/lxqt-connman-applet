@@ -8,6 +8,19 @@ Service::Service(QDBusObjectPath path) :
     connect(this, SIGNAL(PropertyChanged(QString,QDBusVariant)), this, SLOT(onPropertyChange(QString,QDBusVariant)));
 }
 
+QString Service::interfaceName()
+{
+    if (type() != "ethernet")
+    {
+        return QString();
+    }
+
+    QDBusArgument arg = mProperties["Ethernet"].value<QDBusArgument>();
+    QVariantMap map;
+    arg >> map;
+    return map["Interface"].toString();
+}
+
 void Service::setProperty(QString key, QVariant newValue)
 {
     mProperties[key] = newValue;

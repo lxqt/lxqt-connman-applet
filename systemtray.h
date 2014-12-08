@@ -11,6 +11,7 @@
 #include "net.connman.Service.h"
 #include "net.connman.Technology.h"
 
+class Service;
 
 class SystemTray : public QSystemTrayIcon
 {
@@ -18,18 +19,20 @@ class SystemTray : public QSystemTrayIcon
 public:
     explicit SystemTray(QObject *parent = 0);
 
-private:
-
-    QActionGroup technologyEntries;
-    QActionGroup serviceEntries;
-    QAction quitAction;
-    QIcon trayIcon;
+public slots:
+    void updateIcon();
 
 private slots:
     void buildMenu();
     void onTechnologyClicked(QAction* action);
     void onServiceClicked(QAction* action);
-    void setConnectionIcon();
+
+private:
+    QActionGroup technologyEntries;
+    QActionGroup serviceEntries;
+    QAction quitAction;
+    QIcon trayIcon;
+
 };
 
 #endif // SYSTEMTRAY_H

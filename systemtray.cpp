@@ -4,11 +4,12 @@
 #include <QStringList>
 #include <QActionGroup>
 #include <QVariant>
+#include <LXQt/Settings>
+#include <QDBusArgument>
 
 #include "manager.h"
 #include "technology.h"
-#include "connectionstate.h"
-#include "iconfinder.h"
+#include "iconproducer.h"
 
 #include "systemtray.h"
 
@@ -16,10 +17,6 @@
 SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent),
     technologyEntries(this), serviceEntries(this), quitAction(tr("Quit"), this), trayIcon(":/icons/network-wired.png")
 {
-    Manager::instance();
-    QIcon::setThemeName("Oxygen");
-    qDebug() << "Setting icon";
-    setConnectionIcon();
     technologyEntries.setExclusive(false);
 
     setContextMenu(new QMenu());
@@ -27,8 +24,26 @@ SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent),
     connect(&quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(&technologyEntries, SIGNAL(triggered(QAction*)), this, SLOT(onTechnologyClicked(QAction*)));
     connect(&serviceEntries, SIGNAL(triggered(QAction*)), this, SLOT(onServiceClicked(QAction*)));
+
+    connect(Manager::instance(), SIGNAL(connectionStateChanged()), this, SLOT(updateIcon()));
+    connect(LxQt::GlobalSettings::globalSettings(), SIGNAL(iconThemeChanged()), this, SLOT(updateIcon()));
+    updateIcon();
 }
 
+void SystemTray::updateIcon()
+{
+    switch (Manager::instance()->connectionState())
+    {
+    case Manager::Disconnected:
+        setIcon(IconFinder::instance()->wired_disconnected());
+        break;
+    case Manager::Connected_Wired:
+        setIcon(IconFinder::instance()->wired_connected());
+        break;
+    default:
+        setIcon(IconFinder::instance()->wireless(Manager::instance()->signalStrength()));
+    }
+}
 
 void SystemTray::buildMenu()
 {
@@ -36,7 +51,7 @@ void SystemTray::buildMenu()
     contextMenu()->clear();
 
     contextMenu()->addSection("Technologies: ");
-    foreach (Technology* technology, Manager::instance().technologies())
+    foreach (Technology* technology, Manager::instance()->technologies())
     {
         QAction *action = contextMenu()->addAction(technology->name());
         action->setCheckable(true);
@@ -46,9 +61,22 @@ void SystemTray::buildMenu()
     }
 
     contextMenu()->addSection("Services: ");
-    foreach (Service* service, Manager::instance().services())
+    foreach (Service* service, Manager::instance()->services())
     {
-        QAction *action = contextMenu()->addAction(service->name());
+        QAction *action;
+        if (service->type() == "wifi")
+        {
+            QIcon icon = IconFinder::instance()->wireless(service->signalStrength());
+            action = contextMenu()->addAction(icon, service->name());
+        }
+        else if (service->type() == "ethernet")
+        {
+            action = contextMenu()->addAction(QString("%1 (%2)").arg(service->name()).arg(service->interfaceName()));
+        }
+        else
+        {
+            action = contextMenu()->addAction(service->name());
+        }
         action->setCheckable(true);
         action->setChecked(QString("online") == service->state() || QString("ready") == service->state());
         serviceEntries.addAction(action);
@@ -65,7 +93,7 @@ void SystemTray::onTechnologyClicked(QAction *action)
     QDBusObjectPath path = action->data().value<QDBusObjectPath>();
     qDebug() << path.path() << "clicked";
 
-    Technology *technology = Manager::instance().technology(path) ;
+    Technology *technology = Manager::instance()->technology(path) ;
 
     if (! technology)
     {
@@ -79,7 +107,7 @@ void SystemTray::onTechnologyClicked(QAction *action)
 void SystemTray::onServiceClicked(QAction *action)
 {
     QDBusObjectPath path = action->data().value<QDBusObjectPath>();
-    Service* service = Manager::instance().service(path);
+    Service* service = Manager::instance()->service(path);
 
     if (! service)
     {
@@ -102,8 +130,3 @@ void SystemTray::onServiceClicked(QAction *action)
     }
 }
 
-void SystemTray::setConnectionIcon()
-{
-    // FIXME setIcon(IconFinder::instance()->icon());
-	setIcon(QIcon::fromTheme("preferences-system-network"));
-}

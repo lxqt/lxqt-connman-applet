@@ -1,8 +1,13 @@
 <RCC>
-    <qresource prefix="/icons">
-        <file>resources/network-wired.png</file>
-    </qresource>
     <qresource prefix="/interface">
         <file>net.connman.Agent.xml</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>resources/signal-strength-1.svg</file>
+        <file>resources/signal-strength-2.svg</file>
+        <file>resources/signal-strength-3.svg</file>
+        <file>resources/signal-strength-4.svg</file>
+        <file>resources/signal-strength-5.svg</file>
+        <file>resources/signal-strength-0.svg</file>
     </qresource>
 </RCC>

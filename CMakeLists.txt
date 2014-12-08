@@ -3,8 +3,17 @@ cmake_minimum_required( VERSION 2.8.11 )
 project(${PROJECT_NAME})
 
 find_package(lxqt-qt5 REQUIRED QUIET)
+find_package(Qt5Xdg REQUIRED QUIET)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5DBus REQUIRED)
+find_package(Qt5Svg REQUIRED)
+find_package(Qt5LinguistTools REQUIRED QUIET)
+
+set(QTX_LIBRARIES Qt5::Widgets Qt5::DBus Qt5::Svg)
 
 include(${LXQT_USE_FILE})
+include(${QTXDG_USE_FILE})
+
 include(LXQtTranslate)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -25,8 +34,7 @@ set(SRCS
     service.cpp
     agent.cpp
     dialog.cpp
-    connectionstate.cpp
-    iconfinder.cpp
+    iconproducer.cpp
     dialog.ui
     net.connman.Agent.xml
     net.connman.Manager.xml
@@ -41,8 +49,7 @@ set(MOCS
     technology.h
     agent.h
     dialog.h
-    connectionstate.h
-    iconfinder.h
+    iconproducer.h
 )
 
 
@@ -72,11 +79,12 @@ qt5_add_dbus_interface(DBUS_GENERATED net.connman.Technology.xml net.connman.Tec
 
 message(INFO "DBUS_GENERATED: ${DBUS_GENERATED}")
 
-#set(QTX_LIBRARIES ${Qt5Widgets_LIBRARIES} ${Qt5DBus_LIBRARIES} ${Qt5X11Extras_LIBRARIES})
+include(${QTXDG_USE_FILE})
 
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-#    ${QT_QTCORE_INCLUDE_DIR} ${QT_QTGUI_INCLUDE_DIR}
-#    ${LXQT_INCLUDE_DIR}
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${QTXDG_INCLUDE_DIRS}
 )
 
 
@@ -104,7 +112,8 @@ qt5_use_modules(lxqt-connman-applet Core Widgets DBus)
 
 
 #add_dependencies(${PROJECT_NAME} ${LXQT_LIBRARIES})
-#target_link_libraries(${PROJECT_NAME} ${QTX_LIBRARIES} ${LXQT_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${QTX_LIBRARIES}  ${QTXDG_LIBRARIES} ${LXQT_LIBRARIES} )
+
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 install(FILES   ${CONFIG_FILES}    DESTINATION ${APP_SHARE_DIR})

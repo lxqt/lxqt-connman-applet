@@ -21,15 +21,17 @@ public:
     QString name() { return mProperties.value("Name").toString(); }
     QString type() { return mProperties.value("Type").toString(); }
     int signalStrength() { return mProperties.value("Strength").toInt(); }
+    QString interfaceName();
 
     void setProperty(QString key, QVariant newValue);
+    QVariant getProperty(QString key);
 
 private slots:
     void onPropertyChange(QString key, QDBusVariant newValue);
 
 private:
-    const QDBusObjectPath mPath;
     QVariantMap mProperties;
+    const QDBusObjectPath mPath;
 };
 
 QDebug operator<<(QDebug dbg, Service &service);
