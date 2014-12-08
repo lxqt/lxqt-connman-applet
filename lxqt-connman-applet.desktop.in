@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
-Name=Power Management
-GenericName=Power Management Settings
-Exec=lxqt-config-powermanagement
-Icon=preferences-system-power-management
+Name=Network Management
+GenericName=Configure network
+Exec=lxqt-connman-applet
+Icon=preferences-system-network
 Categories=Settings;DesktopSettings;Qt;LXQt;
-OnlyShowIn=LXQt;LXDE;
+OnlyShowIn=LXQt;
 
-#TRANSLATIONS_DIR=translations
+TRANSLATIONS_DIR=translations

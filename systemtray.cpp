@@ -104,5 +104,6 @@ void SystemTray::onServiceClicked(QAction *action)
 
 void SystemTray::setConnectionIcon()
 {
-    setIcon(IconFinder::instance()->icon());
+    // FIXME setIcon(IconFinder::instance()->icon());
+	setIcon(QIcon::fromTheme("preferences-system-network"));
 }

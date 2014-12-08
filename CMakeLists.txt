@@ -1,6 +1,11 @@
 set(PROJECT_NAME lxqt-connman-applet)
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 2.8.11 )
 project(${PROJECT_NAME})
+
+find_package(lxqt-qt5 REQUIRED QUIET)
+
+include(${LXQT_USE_FILE})
+include(LXQtTranslate)
 
 if(NOT CMAKE_BUILD_TYPE)
     set( CMAKE_BUILD_TYPE Debug )
@@ -81,10 +86,8 @@ set(APP_SHARE_DIR share/lxqt/${PROJECT_NAME})
 
 
 # Translations **********************************lxqt-powermanagement/src/CMakeLists.txt:
-#lxqt_translate_desktop(DESKTOP_FILES
-#    SOURCES
-#        resources/lxqt-connman-applet.desktop.in
-#)
+lxqt_translate_desktop(DESKTOP_FILES SOURCES lxqt-connman-applet.desktop.in
+)
 #************************************************
 
 
@@ -94,6 +97,7 @@ add_executable(${PROJECT_NAME}
    ${QRCS_GENERATED}
    ${MOCS_GENERATED}
    ${DBUS_GENERATED}
+   ${DESKTOP_FILES}
 )
 
 qt5_use_modules(lxqt-connman-applet Core Widgets DBus)

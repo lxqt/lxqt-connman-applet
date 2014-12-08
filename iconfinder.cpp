@@ -56,6 +56,7 @@ IconFinder* IconFinder::instance()
 
 QIcon& IconFinder::icon()
 {
+	
     qDebug() << "icon(), themename:" << QIcon::themeName();
     IconNameFinder *iconNameFinder;
     if (QIcon::themeName() == "Oxygen")
