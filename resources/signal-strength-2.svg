@@ -12,35 +12,28 @@
     <rect
        width="60"
        height="60"
-       x="0"
+       x="5"
        y="245"
        style="fill:#00d1a7;stroke:#000000;stroke-width:8"/>
     <rect
        width="60"
        height="120"
-       x="70"
+       x="75"
        y="185"
        style="fill:#00d1a7;stroke:#000000;stroke-width:8" />
 
     <rect
        width="60"
        height="180"
-       x="140"
+       x="145"
        y="125"
        style="fill:none;stroke:#000000;stroke-width:8" />
 
     <rect
        width="60"
        height="240"
-       x="210"
+       x="215"
        y="65"
-       style="fill:none;stroke:#000000;stroke-width:8" />
-
-    <rect
-       width="60"
-       height="300"
-       x="280"
-       y="5"
        style="fill:none;stroke:#000000;stroke-width:8" />
 
 </g>

@@ -43,7 +43,7 @@ void IconFinder::onIconThemeChanged()
 
 void IconFinder::initWirelessIcons()
 {
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 5; i++)
     {
         QString filename = QString(":/resources/signal-strength-%1.svg").arg(i);
         qDebug() << "Looking for:" << filename;
@@ -63,9 +63,8 @@ void IconFinder::initWirelessIcons()
 QIcon& IconFinder::wireless(int strength)
 {
     if (strength < 10) return mWireless[0];
-    else if (strength < 30) return mWireless[1];
-    else if (strength < 50) return mWireless[2];
-    else if (strength < 70) return mWireless[3];
-    else if (strength < 90) return mWireless[4];
-    else                    return mWireless[5];
+    else if (strength < 37) return mWireless[1];
+    else if (strength < 63) return mWireless[2];
+    else if (strength < 90) return mWireless[3];
+    else                    return mWireless[4];
 }
