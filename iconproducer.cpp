@@ -16,9 +16,18 @@ IconFinder* IconFinder::instance()
 
 IconFinder::IconFinder()
 {
+
+
+
+    mBuilt_in_wireless_signal_none      = buildIcon(":/resources/signal-strength-0.svg");
+    mBuilt_in_wireless_signal_weak      = buildIcon(":/resources/signal-strength-1.svg");
+    mBuilt_in_wireless_signal_ok        = buildIcon(":/resources/signal-strength-2.svg");
+    mBuilt_in_wireless_signal_good      = buildIcon(":/resources/signal-strength-3.svg");
+    mBuilt_in_wireless_signal_excellent = buildIcon(":/resources/signal-strength-4.svg");
+
     connect(LxQt::GlobalSettings::globalSettings(), SIGNAL(iconThemeChanged()), this, SLOT(onIconThemeChanged()));
-    initWirelessIcons();
     onIconThemeChanged();
+
 }
 
 IconFinder::~IconFinder()
@@ -28,43 +37,74 @@ IconFinder::~IconFinder()
 void IconFinder::onIconThemeChanged()
 {
     qDebug() << "themeName:" << QIcon::themeName();
+
     if (QIcon::themeName() == "oxygen")
     {
         mWired_connected = QIcon::fromTheme("network-connect");
         mWired_disconnected = QIcon::fromTheme("network-wired");
+
+        mWireless_signal_none      = QIcon::fromTheme("network-wireless-connected-00");
+        mWireless_signal_weak      = QIcon::fromTheme("network-wireless-connected-25");
+        mWireless_signal_ok        = QIcon::fromTheme("network-wireless-connected-50");
+        mWireless_signal_good      = QIcon::fromTheme("network-wireless-connected-75");
+        mWireless_signal_excellent = QIcon::fromTheme("network-wireless-connected-100");
     }
-    else
+    else if (QIcon::hasThemeIcon("network-wireless-signal-none-symbolic") && // Gnome (and others) uses these
+            QIcon::hasThemeIcon("network-wireless-signal-weak-symbolic") &&
+            QIcon::hasThemeIcon("network-wireless-signal-ok-symbolic") &&
+            QIcon::hasThemeIcon("network-wireless-signal-good-symbolic") &&
+            QIcon::hasThemeIcon("network-wireless-signal-excellent-symbolic"))
     {
-        mWired_connected = QIcon::fromTheme("network-transmit");
-        mWired_disconnected = QIcon::fromTheme("network-wired");
+        mWireless_signal_none =      QIcon::fromTheme("network-wireless-signal-none-symbolic");
+        mWireless_signal_weak =      QIcon::fromTheme("network-wireless-signal-weak-symbolic");
+        mWireless_signal_ok =        QIcon::fromTheme("network-wireless-signal-ok-symbolic");
+        mWireless_signal_good =      QIcon::fromTheme("network-wireless-signal-good-symbolic");
+        mWireless_signal_excellent = QIcon::fromTheme("network-wireless-signal-excellent-symbolic");
     }
+    else if (QIcon::hasThemeIcon("network-wireless-signal-none") &&   // AwOken (and others) uses these
+            QIcon::hasThemeIcon("network-wireless-signal-weak") &&
+            QIcon::hasThemeIcon("network-wireless-signal-ok") &&
+            QIcon::hasThemeIcon("network-wireless-signal-good") &&
+            QIcon::hasThemeIcon("network-wireless-signal-excellent"))
+    {
+        mWireless_signal_none =      QIcon::fromTheme("network-wireless-signal-none");
+        mWireless_signal_weak =      QIcon::fromTheme("network-wireless-signal-weak");
+        mWireless_signal_ok =        QIcon::fromTheme("network-wireless-signal-ok");
+        mWireless_signal_good =      QIcon::fromTheme("network-wireless-signal-good");
+        mWireless_signal_excellent = QIcon::fromTheme("network-wireless-signal-excellent");
+    }
+    else // Fallback to ugly built-in icons
+    {
+        mWireless_signal_none = mBuilt_in_wireless_signal_none;
+        mWireless_signal_weak = mBuilt_in_wireless_signal_weak;
+        mWireless_signal_ok = mBuilt_in_wireless_signal_ok;
+        mWireless_signal_good = mBuilt_in_wireless_signal_good;
+        mWireless_signal_excellent = mBuilt_in_wireless_signal_excellent;
+    }
+
+    emit iconsChanged();
 }
 
 
-void IconFinder::initWirelessIcons()
+QIcon IconFinder::buildIcon(QString pathToSvgFile)
 {
-    for (int i = 0; i < 5; i++)
-    {
-        QString filename = QString(":/resources/signal-strength-%1.svg").arg(i);
-        qDebug() << "Looking for:" << filename;
-        QFile svgFile(filename);
-        svgFile.open(QIODevice::ReadOnly);
-        QByteArray svg = svgFile.readAll();
+    QFile svgFile(pathToSvgFile);
+    svgFile.open(QIODevice::ReadOnly);
+    QByteArray svg = svgFile.readAll();
 
-        QSvgRenderer render(svg);
-        QPixmap pixmap(render.defaultSize());
-        pixmap.fill(QColor(0,0,0,0));
-        QPainter painter(&pixmap);
-        render.render(&painter);
-        mWireless << QIcon(pixmap);
-    }
+    QSvgRenderer render(svg);
+    QPixmap pixmap(render.defaultSize());
+    pixmap.fill(QColor(0,0,0,0));
+    QPainter painter(&pixmap);
+    render.render(&painter);
+    return QIcon(pixmap);
 }
 
 QIcon& IconFinder::wireless(int strength)
 {
-    if (strength < 10) return mWireless[0];
-    else if (strength < 37) return mWireless[1];
-    else if (strength < 63) return mWireless[2];
-    else if (strength < 90) return mWireless[3];
-    else                    return mWireless[4];
+    if (strength < 10)      return mWireless_signal_none;
+    else if (strength < 37) return mWireless_signal_weak;
+    else if (strength < 63) return mWireless_signal_ok;
+    else if (strength < 90) return mWireless_signal_good;
+    else                    return mWireless_signal_excellent;
 }

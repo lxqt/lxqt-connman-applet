@@ -26,7 +26,7 @@ SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent),
     connect(&serviceEntries, SIGNAL(triggered(QAction*)), this, SLOT(onServiceClicked(QAction*)));
 
     connect(Manager::instance(), SIGNAL(connectionStateChanged()), this, SLOT(updateIcon()));
-    connect(LxQt::GlobalSettings::globalSettings(), SIGNAL(iconThemeChanged()), this, SLOT(updateIcon()));
+    connect(IconFinder::instance(), SIGNAL(iconsChanged()), this, SLOT(updateIcon()));
     updateIcon();
 }
 
