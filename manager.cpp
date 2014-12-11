@@ -92,6 +92,7 @@ void Manager::onServicesChanged(ObjectPropertiesList changed, QList<QDBusObjectP
         if (!mServiceMap.contains(servicePath))
         {
             Service *service = new Service(servicePath);
+            connect(service, SIGNAL(stateChanged(Service*)), this, SLOT(onServiceStateChange()));
             qDebug() << "Adding" << *service;
             mServiceMap.insert(servicePath, service);
         }
@@ -110,12 +111,18 @@ void Manager::onServicesChanged(ObjectPropertiesList changed, QList<QDBusObjectP
     }
     qDebug() << "Merging done";
 
+    onServiceStateChange();
+}
+
+
+void Manager::onServiceStateChange()
+{
     QSet<Service*> connectedServicesNow;
     bool somethingChanged = false;
 
     foreach (Service *s, services())
     {
-        if (s->state() == "online")
+        if (s->state() == "online" || s->state() == "ready")
         {
             connectedServicesNow << s;
         }
@@ -148,10 +155,11 @@ void Manager::onServicesChanged(ObjectPropertiesList changed, QList<QDBusObjectP
 
 
     mConnectedServices.clear();
-    mConnectedServices.unite(connectedServicesNow);
+    mConnectedServices = connectedServicesNow;
 
     if (somethingChanged)
     {
         emit connectionStateChanged();
     }
+
 }

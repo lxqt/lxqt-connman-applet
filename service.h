@@ -26,6 +26,9 @@ public:
     void setProperty(QString key, QVariant newValue);
     QVariant getProperty(QString key);
 
+signals:
+    void stateChanged(Service* service);
+
 private slots:
     void onPropertyChange(QString key, QDBusVariant newValue);
 

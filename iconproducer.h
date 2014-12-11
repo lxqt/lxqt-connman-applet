@@ -2,15 +2,15 @@
 #define ICONPRODUCER_H
 #include <QIcon>
 
-class IconFinder : public QObject
+class IconProducer : public QObject
 {
     Q_OBJECT
 
 public:
-    static IconFinder* instance();
+    static IconProducer* instance();
 
+    QIcon& disconnected() { return mDisconnected; }
     QIcon& wired_connected() { return mWired_connected; }
-    QIcon& wired_disconnected() { return mWired_disconnected; }
     QIcon& wireless(int strength);
 
 signals:
@@ -20,13 +20,13 @@ private slots:
     void onIconThemeChanged();
 
 private:
-    IconFinder();
-    ~IconFinder();
+    IconProducer();
+    ~IconProducer();
 
     QIcon buildIcon(QString pathToSvgFile);
 
     QIcon mWired_connected;
-    QIcon mWired_disconnected;
+    QIcon mDisconnected;
 
     QIcon mWireless_signal_none;
     QIcon mWireless_signal_weak;

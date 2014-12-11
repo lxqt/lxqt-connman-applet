@@ -26,7 +26,7 @@ SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent),
     connect(&serviceEntries, SIGNAL(triggered(QAction*)), this, SLOT(onServiceClicked(QAction*)));
 
     connect(Manager::instance(), SIGNAL(connectionStateChanged()), this, SLOT(updateIcon()));
-    connect(IconFinder::instance(), SIGNAL(iconsChanged()), this, SLOT(updateIcon()));
+    connect(IconProducer::instance(), SIGNAL(iconsChanged()), this, SLOT(updateIcon()));
     updateIcon();
 }
 
@@ -35,13 +35,13 @@ void SystemTray::updateIcon()
     switch (Manager::instance()->connectionState())
     {
     case Manager::Disconnected:
-        setIcon(IconFinder::instance()->wired_disconnected());
+        setIcon(IconProducer::instance()->disconnected());
         break;
     case Manager::Connected_Wired:
-        setIcon(IconFinder::instance()->wired_connected());
+        setIcon(IconProducer::instance()->wired_connected());
         break;
     default:
-        setIcon(IconFinder::instance()->wireless(Manager::instance()->signalStrength()));
+        setIcon(IconProducer::instance()->wireless(Manager::instance()->signalStrength()));
     }
 }
 
@@ -66,7 +66,7 @@ void SystemTray::buildMenu()
         QAction *action;
         if (service->type() == "wifi")
         {
-            QIcon icon = IconFinder::instance()->wireless(service->signalStrength());
+            QIcon icon = IconProducer::instance()->wireless(service->signalStrength());
             action = contextMenu()->addAction(icon, service->name());
         }
         else if (service->type() == "ethernet")

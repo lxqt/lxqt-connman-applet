@@ -30,6 +30,10 @@ void Service::onPropertyChange(QString key, QDBusVariant newValue)
 {
     qDebug() << "Service::onPropertyChange" << key << ":" << newValue.variant();
     setProperty(key, newValue.variant());
+    if (key == "State")
+    {
+        emit stateChanged(this);
+    }
 }
 
 

@@ -42,17 +42,17 @@ private slots:
     void onTechnologyAdded(QDBusObjectPath path, QVariantMap properties);
     void onTechnologyRemoved(QDBusObjectPath path);
     void onServicesChanged(ObjectPropertiesList changed, QList<QDBusObjectPath> removed);
+    void onServiceStateChange();
 
 private:
     Manager();
-    bool connectionChanged();
+
     State mConnectionState;
     int mSignalStrength;
 
     QMap<QDBusObjectPath, Technology*> mTechnologyMap;
     QMap<QDBusObjectPath, Service*> mServiceMap;
     QList<Service*> mServiceList;
-
     QSet<Service*> mConnectedServices;
 
 };
