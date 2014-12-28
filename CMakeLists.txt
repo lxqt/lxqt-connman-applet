@@ -93,7 +93,7 @@ set(APP_SHARE_DIR share/lxqt/${PROJECT_NAME})
 #************************************************
 
 
-# Translations **********************************lxqt-powermanagement/src/CMakeLists.txt:
+# Translations **********************************
 lxqt_translate_desktop(DESKTOP_FILES SOURCES lxqt-connman-applet.desktop.in
 )
 #************************************************
