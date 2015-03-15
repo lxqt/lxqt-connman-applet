@@ -2,7 +2,7 @@ set(PROJECT_NAME lxqt-connman-applet)
 cmake_minimum_required( VERSION 2.8.11 )
 project(${PROJECT_NAME})
 
-find_package(lxqt-qt5 REQUIRED QUIET)
+find_package(lxqt REQUIRED QUIET)
 find_package(Qt5Xdg REQUIRED QUIET)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5DBus REQUIRED)
