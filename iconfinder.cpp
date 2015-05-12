@@ -50,7 +50,7 @@ public:
         else                    return "network-wireless-connected-100";
     }
 
-    virtual QString ethernetConnectedIconName() { return "network-connnect";}
+    virtual QString ethernetConnectedIconName() { return "network-connect";}
     virtual QString notConnectedIconName() { return "network-disconnect"; }
 
 
