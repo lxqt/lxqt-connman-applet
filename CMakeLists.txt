@@ -1,5 +1,5 @@
 set(PROJECT_NAME lxqt-connman-applet)
-cmake_minimum_required( VERSION 2.8.11 )
+cmake_minimum_required( VERSION 3.0.2 )
 project(${PROJECT_NAME})
 
 find_package(lxqt REQUIRED QUIET)
@@ -8,11 +8,6 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5DBus REQUIRED)
 find_package(Qt5Svg REQUIRED)
 find_package(Qt5LinguistTools REQUIRED QUIET)
-
-set(QTX_LIBRARIES Qt5::Widgets Qt5::DBus Qt5::Svg)
-
-include(${LXQT_USE_FILE})
-include(${QTXDG_USE_FILE})
 
 include(LXQtTranslate)
 
@@ -64,7 +59,6 @@ set(QRCS
 
 find_package(Qt5Widgets REQUIRED QUIET)
 find_package(Qt5DBus REQUIRED QUIET)
-find_package(Qt5Core REQUIRED QUIET)
 
 qt5_wrap_cpp(MOCS_GENERATED ${MOCS})
 qt5_wrap_ui(UIS_GENERATED ${UIS})
@@ -78,8 +72,6 @@ qt5_add_dbus_interface(DBUS_GENERATED net.connman.Service.xml net.connman.Servic
 qt5_add_dbus_interface(DBUS_GENERATED net.connman.Technology.xml net.connman.Technology)
 
 message(INFO "DBUS_GENERATED: ${DBUS_GENERATED}")
-
-include(${QTXDG_USE_FILE})
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -112,8 +104,11 @@ qt5_use_modules(lxqt-connman-applet Core Widgets DBus)
 
 
 #add_dependencies(${PROJECT_NAME} ${LXQT_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${QTX_LIBRARIES}  ${QTXDG_LIBRARIES} ${LXQT_LIBRARIES} )
-
+target_link_libraries(${PROJECT_NAME} 
+                      lxqt
+                      Qt5::Widgets 
+                      Qt5::DBus 
+                      Qt5::Svg)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 install(FILES   ${CONFIG_FILES}    DESTINATION ${APP_SHARE_DIR})
