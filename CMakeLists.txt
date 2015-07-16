@@ -71,7 +71,6 @@ qt5_add_dbus_interface(DBUS_GENERATED net.connman.Manager.xml net.connman.Manage
 qt5_add_dbus_interface(DBUS_GENERATED net.connman.Service.xml net.connman.Service)
 qt5_add_dbus_interface(DBUS_GENERATED net.connman.Technology.xml net.connman.Technology)
 
-message(INFO "DBUS_GENERATED: ${DBUS_GENERATED}")
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -112,5 +111,5 @@ target_link_libraries(${PROJECT_NAME}
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 install(FILES   ${CONFIG_FILES}    DESTINATION ${APP_SHARE_DIR})
-install(FILES   ${DESKTOP_FILES}   DESTINATION share/applications)
+install(FILES   ${DESKTOP_FILES}   DESTINATION ${LXQT_ETC_XDG_DIR}/autostart)
 

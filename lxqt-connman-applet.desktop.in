@@ -1,12 +1,11 @@
 [Desktop Entry]
 Type=Application
-Name=Network Management
-GenericName=Configure network
-Exec=lxqt-connman-applet
+Name=LXQt ConnMan applet
+GenericName=Network Management
+Comment=LXQt panel applet to handle ConnMan
 Icon=preferences-system-network
-Categories=Settings;DesktopSettings;Qt;LXQt;
+TryExec=lxqt-connman-applet
+Exec=lxqt-connman-applet
+Categories=Network;
 OnlyShowIn=LXQt;
 X-LXQt-Need-Tray=true
-X-LXQt-Module=true
-
-TRANSLATIONS_DIR=translations
