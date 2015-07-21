@@ -9,7 +9,6 @@ find_package(Qt5DBus REQUIRED)
 find_package(Qt5Svg REQUIRED)
 find_package(Qt5LinguistTools REQUIRED QUIET)
 
-include(LXQtTranslate)
 
 if(NOT CMAKE_BUILD_TYPE)
     set( CMAKE_BUILD_TYPE Debug )
@@ -81,14 +80,25 @@ include_directories(
 
 set(APP_SHARE_DIR share/lxqt/${PROJECT_NAME})
 
-#************************************************
-
 
 # Translations **********************************
-lxqt_translate_desktop(DESKTOP_FILES SOURCES lxqt-connman-applet.desktop.in
-)
-#************************************************
+include(LXQtTranslate)
 
+file(GLOB TRANSLATE_SOURCES *.ui *.h *.cpp)
+
+lxqt_translate_ts(QM_FILES
+    UPDATE_TRANSLATIONS ${UPDATE_TRANSLATIONS}
+    SOURCES
+         ${TRANSLATE_SOURCES}
+    INSTALL_DIR
+        "${LXQT_TRANSLATIONS_DIR}/${PROJECT_NAME}"
+)
+
+lxqt_app_translation_loader(QM_LOADER ${PROJECT_NAME})
+
+lxqt_translate_desktop(DESKTOP_FILES SOURCES lxqt-connman-applet.desktop.in)
+
+#************************************************
 
 add_executable(${PROJECT_NAME}
    ${SRCS}
@@ -97,6 +107,8 @@ add_executable(${PROJECT_NAME}
    ${MOCS_GENERATED}
    ${DBUS_GENERATED}
    ${DESKTOP_FILES}
+   ${QM_FILES}
+   ${QM_LOADER}
 )
 
 qt5_use_modules(lxqt-connman-applet Core Widgets DBus)
