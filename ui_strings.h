@@ -22,32 +22,18 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
-#ifndef DIALOG_H
-#define DIALOG_H
+#ifndef TRANSLATED_STRINGS_H
+#define	TRANSLATED_STRINGS_H
 
-#include <QDialog>
 #include <QString>
+#include <QMap>
 
-#include "ui_dialog.h"
+/*!
+ * Provides presentation-strings for strings defined by connman. (propertynames, map-keys and such)
+ * 
+ */
+QString uiString(QString str);
 
-class QLineEdit;
 
-namespace Ui {
-class Dialog;
-}
+#endif	/* TRANSLATED_STRINGS_H */
 
-class Dialog : public QDialog, Ui::Dialog
-{
-    Q_OBJECT
-
-public:
-    explicit Dialog(QString service, QVariantMap request, QWidget *parent = 0);
-    ~Dialog();
-
-    QVariantMap collectedInput();
-
-private:
-    QMap<QString, QLineEdit*> inputFields;
-};
-
-#endif // DIALOG_H

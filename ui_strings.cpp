@@ -22,42 +22,34 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
-#include <QFormLayout>
-#include <QLabel>
-#include <QLineEdit>
-
 #include "ui_strings.h"
 
-#include "dialog.h"
+#include <QMap>
+#include <QObject>
 
-Dialog::Dialog(QString service, QVariantMap request, QWidget *parent) :
-    QDialog(parent), Ui::Dialog()
-{
-    setupUi(this);
-    headingLabel->setText(headingLabel->text().arg(service));
+QMap<QString, QString> buildMap() {
+	// Map from connman dbus strings to presentation-strings. 
+	// The connman strings are property names, map keys and such.
+	// This stuff is extracted from connman's dbus api (and surely incomplete..)
+	QMap<QString, QString> map;
+	
+	map["name"] = QObject::tr("name", "network name");
+	map["Identity"] = QObject::tr("Username");
+	map["Username"] = QObject::tr("Username");
+	map["Passphrase"] = QObject::tr("Passphrase");
+	map["PreviousPassphrase"] = QObject::tr("Previous passphrase");
+	
+	map["Wired"] = QObject::tr("Wired");
+	map["WiFi"]	= QObject::tr("Wireless");
+	map["P2P"] = QObject::tr("Peer-to-peer");
+	map["Bluetooth"] = QObject::tr("Bluetooth");
 
-    foreach (QString key, request.keys())
-    {
-        QLabel *label = new QLabel(uiString(key), this);
-        QLineEdit *lineEdit = new QLineEdit(this);
-        inputFields[key] = lineEdit;
-        inputFieldsLayout->addRow(label, lineEdit);
-    }
+	return map;
 }
 
-Dialog::~Dialog()
-{
+QString uiString(QString string) {
+	static QMap<QString, QString> translationMap = buildMap();
+	
+	// If we don't know anything about the string we just return it as it is.
+	return translationMap.value(string, string); 
 }
-
-QVariantMap Dialog::collectedInput()
-{
-    QVariantMap collected;
-
-    foreach (QString key, inputFields.keys())
-    {
-        collected[key] = inputFields[key]->text(); // FIXME Handle bytearrays
-    }
-
-    return collected;
-}
-

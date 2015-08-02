@@ -34,6 +34,7 @@
 #include "manager.h"
 #include "technology.h"
 #include "iconproducer.h"
+#include "ui_strings.h"
 
 #include "systemtray.h"
 
@@ -74,32 +75,34 @@ void SystemTray::buildMenu()
     qDebug() << "Building menu..." ;
     contextMenu()->clear();
 
-    contextMenu()->addSection("Technologies: ");
+    contextMenu()->addSection(tr("Technologies:"));
     foreach (Technology* technology, Manager::instance()->technologies())
     {
-        QAction *action = contextMenu()->addAction(technology->name());
+        QAction *action = contextMenu()->addAction(uiString(technology->name()));
         action->setCheckable(true);
         action->setChecked(technology->powered());
         technologyEntries.addAction(action);
         action->setData(QVariant::fromValue<QDBusObjectPath>(technology->path()));
     }
 
-    contextMenu()->addSection("Services: ");
+    contextMenu()->addSection(tr("Services: "));
     foreach (Service* service, Manager::instance()->services())
     {
         QAction *action;
         if (service->type() == "wifi")
         {
             QIcon icon = IconProducer::instance()->wireless(service->signalStrength());
-            action = contextMenu()->addAction(icon, service->name());
+            action = contextMenu()->addAction(icon, service->name()); // Service name is an ESSID - so no translation
         }
         else if (service->type() == "ethernet")
         {
-            action = contextMenu()->addAction(QString("%1 (%2)").arg(service->name()).arg(service->interfaceName()));
+            action = contextMenu()->addAction(QString("%1 (%2)")
+                                                .arg(uiString(service->name()))
+                                                .arg(uiString(service->interfaceName())));
         }
         else
         {
-            action = contextMenu()->addAction(service->name());
+            action = contextMenu()->addAction(uiString(service->name()));
         }
         action->setCheckable(true);
         action->setChecked(QString("online") == service->state() || QString("ready") == service->state());
