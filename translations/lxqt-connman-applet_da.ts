@@ -5,8 +5,8 @@
     <name>Dialog</name>
     <message>
         <location filename="../dialog.ui" line="14"/>
-        <source>Dialog</source>
-        <translation>Dialog</translation>
+        <source>LXQt ConnMan applet</source>
+        <translation>LXQt ConnMan applet</translation>
     </message>
     <message>
         <location filename="../dialog.ui" line="25"/>

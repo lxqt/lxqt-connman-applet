@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>85</height>
+    <width>433</width>
+    <height>159</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>LXQt ConnMan applet</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
