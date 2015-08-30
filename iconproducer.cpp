@@ -46,7 +46,7 @@ IconProducer::IconProducer()
     mBuilt_in_wireless_signal_good      = buildIcon(":/resources/signal-strength-3.svg");
     mBuilt_in_wireless_signal_excellent = buildIcon(":/resources/signal-strength-4.svg");
 
-    connect(LxQt::GlobalSettings::globalSettings(), SIGNAL(iconThemeChanged()), this, SLOT(onIconThemeChanged()));
+    connect(LXQt::GlobalSettings::globalSettings(), SIGNAL(iconThemeChanged()), this, SLOT(onIconThemeChanged()));
     onIconThemeChanged();
 }
 
