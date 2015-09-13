@@ -104,32 +104,54 @@ void SystemTray::buildMenu()
     contextMenu()->addAction(&servicesHeading);
     foreach (Service* service, Manager::instance()->services())
     {
-        QAction *action;
-        if (service->type() == "wifi")
-        {
-            QIcon icon = IconProducer::instance()->wireless(service->signalStrength());
-            action = contextMenu()->addAction(icon, service->name()); // Service name is an ESSID - so no translation
-        }
-        else if (service->type() == "ethernet")
-        {
-            action = contextMenu()->addAction(QString("%1 (%2)")
-                                                .arg(uiString(service->name()))
-                                                .arg(uiString(service->interfaceName())));
-        }
-        else
-        {
-            action = contextMenu()->addAction(uiString(service->name()));
-        }
-        action->setCheckable(true);
-        action->setChecked(QString("online") == service->state() || QString("ready") == service->state());
+        QAction* action = contextMenu()->addAction("");
         serviceEntries.addAction(action);
-        action->setData(QVariant::fromValue<QDBusObjectPath>(service->path()));
+        update(action, service);
+
     }
     contextMenu()->addSeparator();
     contextMenu()->addAction(&quitAction);
 
 }
 
+void SystemTray::update(QAction *action, Service *service)
+{
+    QString actionText;
+    QIcon actionIcon;
+
+    if (service->type() == "wifi")
+    {
+        actionIcon = IconProducer::instance()->wireless(service->signalStrength());
+        actionText = service->name();
+    }
+    else if (service->type() == "ethernet")
+    {
+        actionText = QString("%1 (%2)").arg(uiString(service->name())).arg(uiString(service->interfaceName()));
+    }
+    else
+    {
+        actionText = uiString(service->name());
+    }
+
+    if (service->state() == "association")
+    {
+        actionText.append(" (a)");
+    }
+    else if (service->state() == "configuration")
+    {
+        actionText.append(" (c)");
+    }
+    else if (service->state() == "ready")
+    {
+        actionText.append(" (R)");
+    }
+
+    action->setIcon(actionIcon);
+    action->setText(actionText);
+    action->setData(QVariant::fromValue<QDBusObjectPath>(service->path()));
+    action->setCheckable(true);
+    action->setChecked(service->state() == "online");
+}
 
 void SystemTray::onTechnologyClicked(QAction *action)
 {

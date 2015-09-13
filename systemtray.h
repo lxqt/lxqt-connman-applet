@@ -53,6 +53,7 @@ private slots:
     void onServiceClicked(QAction* action);
 
 private:
+    void update(QAction* action, Service* service);
     QActionGroup technologyEntries;
     QActionGroup serviceEntries;
     QWidgetAction technologyHeading;
