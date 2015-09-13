@@ -27,6 +27,8 @@
 #include <QString>
 #include <QStringList>
 #include <QActionGroup>
+#include <QLabel>
+
 #include <QVariant>
 #include <LXQt/Settings>
 #include <QDBusArgument>
@@ -39,10 +41,25 @@
 #include "systemtray.h"
 
 
-SystemTray::SystemTray(QObject *parent) : QSystemTrayIcon(parent),
-    technologyEntries(this), serviceEntries(this), quitAction(tr("Quit"), this), trayIcon(":/icons/network-wired.png")
+SystemTray::SystemTray(QObject *parent) :
+    QSystemTrayIcon(parent),
+    technologyEntries(this),
+    serviceEntries(this),
+    technologyHeading(this),
+    servicesHeading(this),
+    quitAction(tr("Quit"), this),
+    trayIcon(":/icons/network-wired.png")
 {
     technologyEntries.setExclusive(false);
+    QLabel* technologyHeadingLabel = new QLabel("<b>" + tr("Technologies:") + "</b>");
+    technologyHeadingLabel->setMargin(5);
+    technologyHeading.setDefaultWidget(technologyHeadingLabel);
+
+    QLabel* servicesHeadingLabel = new QLabel("<b>" + tr("Services:") + "</b>");
+    servicesHeadingLabel->setMargin(5);
+    servicesHeading.setDefaultWidget(servicesHeadingLabel);
+
+    quitAction.setIcon(QIcon::fromTheme("application-exit"));
 
     setContextMenu(new QMenu());
     connect(contextMenu(), SIGNAL(aboutToShow()), this, SLOT(buildMenu()));
@@ -74,8 +91,7 @@ void SystemTray::buildMenu()
 {
     qDebug() << "Building menu..." ;
     contextMenu()->clear();
-
-    contextMenu()->addSection(tr("Technologies:"));
+    contextMenu()->addAction(&technologyHeading);
     foreach (Technology* technology, Manager::instance()->technologies())
     {
         QAction *action = contextMenu()->addAction(uiString(technology->name()));
@@ -84,8 +100,8 @@ void SystemTray::buildMenu()
         technologyEntries.addAction(action);
         action->setData(QVariant::fromValue<QDBusObjectPath>(technology->path()));
     }
-
-    contextMenu()->addSection(tr("Services: "));
+    contextMenu()->addSeparator();
+    contextMenu()->addAction(&servicesHeading);
     foreach (Service* service, Manager::instance()->services())
     {
         QAction *action;
@@ -109,7 +125,7 @@ void SystemTray::buildMenu()
         serviceEntries.addAction(action);
         action->setData(QVariant::fromValue<QDBusObjectPath>(service->path()));
     }
-
+    contextMenu()->addSeparator();
     contextMenu()->addAction(&quitAction);
 
 }

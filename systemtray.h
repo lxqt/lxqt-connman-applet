@@ -27,6 +27,7 @@
 
 #include <QSystemTrayIcon>
 #include <QActionGroup>
+#include <QWidgetAction>
 #include <QList>
 
 #include "dbus_types.h"
@@ -54,6 +55,8 @@ private slots:
 private:
     QActionGroup technologyEntries;
     QActionGroup serviceEntries;
+    QWidgetAction technologyHeading;
+    QWidgetAction servicesHeading;
     QAction quitAction;
     QIcon trayIcon;
 
