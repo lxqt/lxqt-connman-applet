@@ -188,7 +188,7 @@ void SystemTray::onServiceClicked(QAction *action)
         qDebug() << "Connect...";
         service->Connect();
     }
-    else if (service->state() == "online")
+    else
     {
         qDebug() << "disconnect...";
         service->disconnect();
