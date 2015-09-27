@@ -26,7 +26,7 @@
 #include <QLabel>
 #include <QLineEdit>
 
-#include "ui_strings.h"
+#include "strings.h"
 
 #include "dialog.h"
 
@@ -38,7 +38,7 @@ Dialog::Dialog(QString service, QVariantMap request, QWidget *parent) :
 
     foreach (QString key, request.keys())
     {
-        QLabel *label = new QLabel(uiString(key), this);
+        QLabel *label = new QLabel(string(key), this);
         QLineEdit *lineEdit = new QLineEdit(this);
         inputFields[key] = lineEdit;
         inputFieldsLayout->addRow(label, lineEdit);

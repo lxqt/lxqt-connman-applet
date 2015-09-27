@@ -22,7 +22,7 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
-#include "ui_strings.h"
+#include "strings.h"
 
 #include <QMap>
 #include <QObject>
@@ -47,7 +47,7 @@ QMap<QString, QString> buildMap() {
 	return map;
 }
 
-QString uiString(QString string) {
+QString string(QString string) {
 	static QMap<QString, QString> translationMap = buildMap();
 	
 	// If we don't know anything about the string we just return it as it is.

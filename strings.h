@@ -22,8 +22,8 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
-#ifndef TRANSLATED_STRINGS_H
-#define	TRANSLATED_STRINGS_H
+#ifndef STRINGS_H
+#define	STRINGS_H
 
 #include <QString>
 #include <QMap>
@@ -32,8 +32,8 @@
  * Provides presentation-strings for strings defined by connman. (propertynames, map-keys and such)
  * 
  */
-QString uiString(QString str);
+QString string(QString str);
 
 
-#endif	/* TRANSLATED_STRINGS_H */
+#endif	/* STRINGS_H */
 

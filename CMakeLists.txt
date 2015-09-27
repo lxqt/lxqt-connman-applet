@@ -29,7 +29,7 @@ set(SRCS
     agent.cpp
     dialog.cpp
     iconproducer.cpp
-    ui_strings.cpp
+    strings.cpp
     dialog.ui
     net.connman.Agent.xml
     net.connman.Manager.xml

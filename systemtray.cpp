@@ -36,7 +36,7 @@
 #include "manager.h"
 #include "technology.h"
 #include "iconproducer.h"
-#include "ui_strings.h"
+#include "strings.h"
 
 #include "systemtray.h"
 
@@ -94,7 +94,7 @@ void SystemTray::buildMenu()
     contextMenu()->addAction(&technologyHeading);
     foreach (Technology* technology, Manager::instance()->technologies())
     {
-        QAction *action = contextMenu()->addAction(uiString(technology->name()));
+        QAction *action = contextMenu()->addAction(string(technology->name()));
         action->setCheckable(true);
         action->setChecked(technology->powered());
         technologyEntries.addAction(action);
@@ -126,11 +126,11 @@ void SystemTray::update(QAction *action, Service *service)
     }
     else if (service->type() == "ethernet")
     {
-        actionText = QString("%1 (%2)").arg(uiString(service->name())).arg(uiString(service->interfaceName()));
+        actionText = QString("%1 (%2)").arg(string(service->name())).arg(string(service->interfaceName()));
     }
     else
     {
-        actionText = uiString(service->name());
+        actionText = string(service->name());
     }
 
     if (service->state() == "association")
