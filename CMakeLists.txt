@@ -15,53 +15,14 @@ if(NOT CMAKE_BUILD_TYPE)
 endif (NOT CMAKE_BUILD_TYPE)
 
 
-set(HDRS
-    dbus_types.h
-)
+file(GLOB SRCS *.cpp *.xml *.qrc)
 
-
-set(SRCS
-    main.cpp
-    systemtray.cpp
-    manager.cpp
-    technology.cpp
-    service.cpp
-    agent.cpp
-    dialog.cpp
-    iconproducer.cpp
-    strings.cpp
-    dialog.ui
-    net.connman.Agent.xml
-    net.connman.Manager.xml
-    net.connman.Service.xml
-    net.connman.Technology.xml
-)
-
-set(MOCS
-    systemtray.h
-    manager.h
-    service.h
-    technology.h
-    agent.h
-    dialog.h
-    iconproducer.h
-)
-
-
-set(UIS
-    dialog.ui
-)
-
-set(QRCS
-   resources.qrc
-)
-
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5Widgets REQUIRED QUIET)
 find_package(Qt5DBus REQUIRED QUIET)
 
-qt5_wrap_cpp(MOCS_GENERATED ${MOCS})
-qt5_wrap_ui(UIS_GENERATED ${UIS})
 qt5_add_resources(QRCS_GENERATED ${QRCS})
 
 qt5_add_dbus_adaptor(DBUS_GENERATED net.connman.Agent.xml agent.h Agent)
@@ -103,9 +64,7 @@ lxqt_translate_desktop(DESKTOP_FILES SOURCES lxqt-connman-applet.desktop.in)
 
 add_executable(${PROJECT_NAME}
    ${SRCS}
-   ${HDRS}
    ${QRCS_GENERATED}
-   ${MOCS_GENERATED}
    ${DBUS_GENERATED}
    ${DESKTOP_FILES}
    ${QM_FILES}
@@ -115,7 +74,6 @@ add_executable(${PROJECT_NAME}
 qt5_use_modules(lxqt-connman-applet Core Widgets DBus)
 
 
-#add_dependencies(${PROJECT_NAME} ${LXQT_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} 
                       lxqt
                       Qt5::Widgets 
