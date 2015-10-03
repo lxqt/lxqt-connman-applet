@@ -1,5 +1,7 @@
 set(PROJECT_NAME lxqt-connman-applet)
 cmake_minimum_required( VERSION 3.0.2 )
+set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS}")
+
 project(${PROJECT_NAME})
 
 find_package(lxqt REQUIRED QUIET)
@@ -15,7 +17,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif (NOT CMAKE_BUILD_TYPE)
 
 
-file(GLOB SRCS *.cpp *.xml *.qrc)
+file(GLOB SRCS *.cpp clickableframe.h *.xml *.qrc *ui)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)

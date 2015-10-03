@@ -28,6 +28,7 @@
 #include <QDBusContext>
 #include <QDBusObjectPath>
 #include <QDebug>
+#include "net.connman.Manager.h"
 
 class Agent : public QObject, protected QDBusContext
 {
@@ -48,6 +49,8 @@ signals:
     void operationCanceled();
 
 private:
+    QString getName(QDBusObjectPath servicePath);
+    NetConnmanManagerInterface managerInterface;
     QDBusObjectPath path;
 };
 

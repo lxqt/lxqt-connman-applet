@@ -27,23 +27,21 @@
 
 #include "agent.h"
 #include "agentadaptor.h"
-#include "net.connman.Manager.h"
 #include "dialog.h"
-#include "service.h"
-#include "manager.h"
 
-Agent::Agent() : QObject(), path("/org/lxqt/lxqt_connman_agent")
+Agent::Agent() :
+    QObject(),
+    path("/org/lxqt/lxqt_connman_agent"),
+    managerInterface("net.connman", "/", QDBusConnection::systemBus())
 {
-    QDBusConnection bus = QDBusConnection::systemBus();
-    bus.registerService("org.lxqt.lxqt_connman_agent");
+    QDBusConnection::systemBus().registerService("org.lxqt.lxqt_connman_agent");
 
     new AgentAdaptor(this);
     new IntrospectableAdaptor(this);
 
-    bus.registerObject(path.path(), this);
+    QDBusConnection::systemBus().registerObject(path.path(), this);
 
-    NetConnmanManagerInterface netConnmanManagerInterface("net.connman", "/", bus);
-    netConnmanManagerInterface.RegisterAgent(path);
+    managerInterface.RegisterAgent(path);
 
  }
 
@@ -74,15 +72,14 @@ void Agent::RequestBrowser(QDBusObjectPath service, QString url)
 
 QVariantMap Agent::RequestInput(QDBusObjectPath servicePath, QVariantMap fields)
 {
-    Service *service = Manager::instance()->service(servicePath);
-
-    if (!service)
+    QString serviceName = getName(servicePath);
+    if (serviceName.isEmpty())
     {
         sendErrorReply("net.connman.Agent.Error.Canceled", "Unknown service");
         return QVariantMap();
     }
 
-    Dialog infoDialog(service->name(), fields);
+    Dialog infoDialog(serviceName, fields);
     connect(this, SIGNAL(operationCanceled()), &infoDialog, SLOT(reject()));
 
     if (Dialog::Rejected == infoDialog.exec())
@@ -107,4 +104,9 @@ QString Agent::Introspect()
     xmlFile.open(QIODevice::ReadOnly);
     QString xml(xmlFile.readAll());
     return xml;
+}
+
+QString Agent::getName(QDBusObjectPath servicePath)
+{
+
 }

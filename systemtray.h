@@ -44,23 +44,12 @@ class SystemTray : public QSystemTrayIcon
 public:
     explicit SystemTray(QObject *parent = 0);
 
-public slots:
-    void updateIcon();
+signals:
+    void showServicesWindow();
+    void toggleShowServicesWindow();
 
 private slots:
-    void buildMenu();
-    void onTechnologyClicked(QAction* action);
-    void onServiceClicked(QAction* action);
-
-private:
-    void update(QAction* action, Service* service);
-    QActionGroup technologyEntries;
-    QActionGroup serviceEntries;
-    QWidgetAction technologyHeading;
-    QWidgetAction servicesHeading;
-    QAction quitAction;
-    QIcon trayIcon;
-
+    void about();
 };
 
 #endif // SYSTEMTRAY_H

@@ -25,20 +25,25 @@
 #include <QApplication>
 #include <QDebug>
 
-#include "systemtray.h"
 #include "agent.h"
-#include "dialog.h"
+#include "serviceswindow.h"
 
 int main(int argc, char *argv[])
 {
+    qDBusRegisterMetaType<ObjectProperties>();
+    qDBusRegisterMetaType<ObjectPropertiesList>();
+    qDBusRegisterMetaType<QList<QDBusObjectPath> >();
+
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
 
     Agent agent;
     Q_UNUSED(agent)
 
-    SystemTray tray;
-    tray.show();
+    ServicesWindow servicesWindow;
+    servicesWindow.show();
+    /*SystemTray tray;
+    tray.show();*/
 
     return a.exec();
 }

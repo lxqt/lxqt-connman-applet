@@ -33,8 +33,6 @@
 #include <LXQt/Settings>
 #include <QDBusArgument>
 
-#include "manager.h"
-#include "technology.h"
 #include "iconproducer.h"
 #include "strings.h"
 
@@ -42,156 +40,24 @@
 
 
 SystemTray::SystemTray(QObject *parent) :
-    QSystemTrayIcon(parent),
-    technologyEntries(this),
-    serviceEntries(this),
-    technologyHeading(this),
-    servicesHeading(this),
-    quitAction(tr("Quit"), this),
-    trayIcon(":/icons/network-wired.png")
+    QSystemTrayIcon(parent)
 {
-    technologyEntries.setExclusive(false);
-    QLabel* technologyHeadingLabel = new QLabel("<b>" + tr("Technologies:") + "</b>");
-    technologyHeadingLabel->setMargin(5);
-    technologyHeading.setDefaultWidget(technologyHeadingLabel);
+    setIcon(IconProducer::instance()->disconnected());
 
-    QLabel* servicesHeadingLabel = new QLabel("<b>" + tr("Services:") + "</b>");
-    servicesHeadingLabel->setMargin(5);
-    servicesHeading.setDefaultWidget(servicesHeadingLabel);
+    QMenu *menu = new QMenu();
+    QAction *showServicesAction = menu->addAction(tr("Services..."));
+    QAction *aboutAction = menu->addAction(tr("About"));
+    QAction *quitAction = menu->addAction(tr("Quit"));
+    setContextMenu(menu);
 
-    quitAction.setIcon(QIcon::fromTheme("application-exit"));
-
-    setContextMenu(new QMenu());
-    connect(contextMenu(), SIGNAL(aboutToShow()), this, SLOT(buildMenu()));
-    connect(&quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
-    connect(&technologyEntries, SIGNAL(triggered(QAction*)), this, SLOT(onTechnologyClicked(QAction*)));
-    connect(&serviceEntries, SIGNAL(triggered(QAction*)), this, SLOT(onServiceClicked(QAction*)));
-
-    connect(Manager::instance(), SIGNAL(connectionStateChanged()), this, SLOT(updateIcon()));
-    connect(IconProducer::instance(), SIGNAL(iconsChanged()), this, SLOT(updateIcon()));
-    updateIcon();
+    connect(showServicesAction, SIGNAL(triggered(bool)), SIGNAL(showServicesWindow()));
+    connect(aboutAction, SIGNAL(triggered(bool)), SLOT(about()));
+    connect(quitAction, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
 }
 
-void SystemTray::updateIcon()
+void SystemTray::about()
 {
-    switch (Manager::instance()->connectionState())
-    {
-    case Manager::Disconnected:
-        setIcon(IconProducer::instance()->disconnected());
-        break;
-    case Manager::Connected_Wired:
-        setIcon(IconProducer::instance()->wired_connected());
-        break;
-    default:
-        setIcon(IconProducer::instance()->wireless(Manager::instance()->signalStrength()));
-    }
+    qDebug() << "about";
 }
 
-void SystemTray::buildMenu()
-{
-    qDebug() << "Building menu..." ;
-    contextMenu()->clear();
-    contextMenu()->addAction(&technologyHeading);
-    foreach (Technology* technology, Manager::instance()->technologies())
-    {
-        QAction *action = contextMenu()->addAction(string(technology->name()));
-        action->setCheckable(true);
-        action->setChecked(technology->powered());
-        technologyEntries.addAction(action);
-        action->setData(QVariant::fromValue<QDBusObjectPath>(technology->path()));
-    }
-    contextMenu()->addSeparator();
-    contextMenu()->addAction(&servicesHeading);
-    foreach (Service* service, Manager::instance()->services())
-    {
-        QAction* action = contextMenu()->addAction("");
-        serviceEntries.addAction(action);
-        update(action, service);
-
-    }
-    contextMenu()->addSeparator();
-    contextMenu()->addAction(&quitAction);
-
-}
-
-void SystemTray::update(QAction *action, Service *service)
-{
-    QString actionText;
-    QIcon actionIcon;
-
-    if (service->type() == "wifi")
-    {
-        actionIcon = IconProducer::instance()->wireless(service->signalStrength());
-        actionText = service->name();
-    }
-    else if (service->type() == "ethernet")
-    {
-        actionText = QString("%1 (%2)").arg(string(service->name())).arg(string(service->interfaceName()));
-    }
-    else
-    {
-        actionText = string(service->name());
-    }
-
-    if (service->state() == "association")
-    {
-        actionText.append(" (a)");
-    }
-    else if (service->state() == "configuration")
-    {
-        actionText.append(" (c)");
-    }
-    else if (service->state() == "ready")
-    {
-        actionText.append(" (R)");
-    }
-
-    action->setIcon(actionIcon);
-    action->setText(actionText);
-    action->setData(QVariant::fromValue<QDBusObjectPath>(service->path()));
-    action->setCheckable(true);
-    action->setChecked(service->state() == "online");
-}
-
-void SystemTray::onTechnologyClicked(QAction *action)
-{
-    QDBusObjectPath path = action->data().value<QDBusObjectPath>();
-    qDebug() << path.path() << "clicked";
-
-    Technology *technology = Manager::instance()->technology(path) ;
-
-    if (! technology)
-    {
-        qWarning() << "Invalid technology clicked:" << path.path();
-        return;
-    }
-
-    technology->togglePowered();
-}
-
-void SystemTray::onServiceClicked(QAction *action)
-{
-    QDBusObjectPath path = action->data().value<QDBusObjectPath>();
-    Service* service = Manager::instance()->service(path);
-
-    if (! service)
-    {
-        qWarning() << "Invalid service clicked:" << path.path();
-        return;
-    }
-
-    qDebug() << "Service" << service->name() << "clicked";
-    qDebug() << "State:" << service->state();
-
-    if (service->state() == "idle" || service->state() == "failure")
-    {
-        qDebug() << "Connect...";
-        service->Connect();
-    }
-    else
-    {
-        qDebug() << "disconnect...";
-        service->disconnect();
-    }
-}
 
