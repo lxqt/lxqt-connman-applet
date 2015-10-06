@@ -47,13 +47,25 @@ SystemTray::SystemTray(QObject *parent) :
     QMenu *menu = new QMenu();
     QAction *showServicesAction = menu->addAction(tr("Services..."));
     QAction *aboutAction = menu->addAction(tr("About"));
+    aboutAction->setIcon(QIcon::fromTheme("help-about"));
     QAction *quitAction = menu->addAction(tr("Quit"));
+    quitAction->setIcon(QIcon::fromTheme("application-exit"));
     setContextMenu(menu);
 
     connect(showServicesAction, SIGNAL(triggered(bool)), SIGNAL(showServicesWindow()));
     connect(aboutAction, SIGNAL(triggered(bool)), SLOT(about()));
     connect(quitAction, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+    connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
 }
+
+void SystemTray::onActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    if (reason == QSystemTrayIcon::Trigger) {
+        emit leftClicked();
+    }
+}
+
+
 
 void SystemTray::about()
 {

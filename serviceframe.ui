@@ -14,10 +14,7 @@
    <string>Frame</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-
-
-</string>
+   <string notr="true"/>
   </property>
   <property name="frameShape">
    <enum>QFrame::NoFrame</enum>
@@ -66,10 +63,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(200,200,200);
-border-width: 1px;
-border-style: solid;
-border-radius: 8px;</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string/>

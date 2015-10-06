@@ -45,10 +45,11 @@ public:
     explicit SystemTray(QObject *parent = 0);
 
 signals:
+    void leftClicked();
     void showServicesWindow();
-    void toggleShowServicesWindow();
 
 private slots:
+    void onActivated(QSystemTrayIcon::ActivationReason reason);
     void about();
 };
 

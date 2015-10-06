@@ -50,10 +50,10 @@ void ServiceFrame::onPropertyChanged(const QString &name, const QDBusVariant &va
 void ServiceFrame::setIcon()
 {
     qDebug() << "setIcon, type() = " << type();
-    QString styleSheet = "";
-    QIcon icon;
     if (type() == "wifi")
     {
+        QString styleSheet = "";
+        QIcon icon;
         int strength = properties["Strength"].toInt();
         icon = IconProducer::instance()->wireless(strength);
         if (state() == "online") {
@@ -65,9 +65,13 @@ void ServiceFrame::setIcon()
                     "  border-radius: 8px; "
                     "}";
         }
+        ui->iconLabel->setPixmap(icon.pixmap(30,30));
+        ui->iconLabel->setStyleSheet(styleSheet);
     }
-    ui->iconLabel->setPixmap(icon.pixmap(30,30));
-    ui->iconLabel->setStyleSheet(styleSheet);
+    else {
+        QString iconText = state() == "online" ? QString(QChar(0x2713)) : "";
+        ui->iconLabel->setText(iconText);
+    }
 }
 
 void ServiceFrame::setName()
@@ -75,8 +79,11 @@ void ServiceFrame::setName()
     QString name = string(properties["Name"].toString());
     qDebug() << "setName(), name =" << name;
     if (type() == "ethernet")
-    {
-        QString interfaceName = "FIXME";
+    { 
+        QDBusArgument dict = properties["Ethernet"].value<QDBusArgument>();
+        QVariantMap map;
+        dict >> map;
+        QString interfaceName = map["Interface"].toString();
         ui->nameLabel->setText(name + " (" + interfaceName + ")");
     }
     else

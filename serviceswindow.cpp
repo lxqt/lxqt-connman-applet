@@ -40,6 +40,11 @@ ServicesWindow::~ServicesWindow()
     delete ui;
 }
 
+void ServicesWindow::toggleShow()
+{
+     setVisible(! isVisible());
+}
+
 void ServicesWindow::keyReleaseEvent(QKeyEvent *event)
 {
     qDebug() << "Release: " << event->key() << ", text:" << event->text();

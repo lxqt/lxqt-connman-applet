@@ -22,6 +22,10 @@ class ServicesWindow : public QDialog
 public:
     explicit ServicesWindow(QWidget *parent = 0);
     ~ServicesWindow();
+
+public slots:
+    void toggleShow();
+
 protected:
     virtual void keyReleaseEvent(QKeyEvent *event);
 
