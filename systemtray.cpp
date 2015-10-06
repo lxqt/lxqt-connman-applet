@@ -28,6 +28,7 @@
 #include <QStringList>
 #include <QActionGroup>
 #include <QLabel>
+#include <QMessageBox>
 
 #include <QVariant>
 #include <LXQt/Settings>
@@ -69,7 +70,18 @@ void SystemTray::onActivated(QSystemTrayIcon::ActivationReason reason)
 
 void SystemTray::about()
 {
-    qDebug() << "about";
+    QMessageBox::about(0,
+                       tr("About"),
+                       tr( "<p>"
+                           "  <b>LXQt Connman Client</b>"
+                           "</p>"
+                           "<p>"
+                           "Copyright 2014, 2015"
+                           "</p>"
+                           "<p>"
+                           "Christian Surlykke"
+                           "</p>"
+                        ));
 }
 
 
