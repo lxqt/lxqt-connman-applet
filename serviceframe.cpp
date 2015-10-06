@@ -14,9 +14,7 @@ ServiceFrame::ServiceFrame(QString path, const QVariantMap &properties, QWidget 
     setMouseTracking(true);
     connect(&serviceInterface, SIGNAL(PropertyChanged(QString,QDBusVariant)),
                                SLOT(onPropertyChanged(QString,QDBusVariant)));
-    setIcon();
-    setName();
-    setState();
+    updateUI();
 }
 
 ServiceFrame::~ServiceFrame()
@@ -42,14 +40,11 @@ void ServiceFrame::click()
 void ServiceFrame::onPropertyChanged(const QString &name, const QDBusVariant &value)
 {
     properties[name] = value.variant();
-    setIcon();
-    setName();
-    setState();
+    updateUI();
 }
 
-void ServiceFrame::setIcon()
+void ServiceFrame::updateUI()
 {
-    qDebug() << "setIcon, type() = " << type();
     if (type() == "wifi")
     {
         QString styleSheet = "";
@@ -72,14 +67,11 @@ void ServiceFrame::setIcon()
         QString iconText = state() == "online" ? QString(QChar(0x2713)) : "";
         ui->iconLabel->setText(iconText);
     }
-}
 
-void ServiceFrame::setName()
-{
+
     QString name = string(properties["Name"].toString());
-    qDebug() << "setName(), name =" << name;
     if (type() == "ethernet")
-    { 
+    {
         QDBusArgument dict = properties["Ethernet"].value<QDBusArgument>();
         QVariantMap map;
         dict >> map;
@@ -91,23 +83,16 @@ void ServiceFrame::setName()
         ui->nameLabel->setText(name);
     }
 
-}
-
-void ServiceFrame::setState()
-{
-    qDebug() << "setState(), state =" << state();
     if (state() == "idle" || state() == "online") {
         ui->stateLabel->hide();
     }
     else {
         ui->stateLabel->show();
         if (state() == "failure") {
-            qDebug() << "Failure: " << properties["Error"];
             ui->stateLabel->setText(properties["Error"].toString());
         }
         else{
             ui->stateLabel->setText(string(state()));
         }
     }
-
 }

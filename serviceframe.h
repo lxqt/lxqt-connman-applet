@@ -19,13 +19,14 @@ public:
 
     virtual void click();
 
+signals:
+    void stateChanged();
+
 private slots:
     void onPropertyChanged(const QString& name, const QDBusVariant& value);
 
 private:
-    void setIcon();
-    void setName();
-    void setState();
+    void updateUI();
 
     QString type() { return properties["Type"].toString(); }
     QString state() { return properties["State"].toString(); }
