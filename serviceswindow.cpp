@@ -1,8 +1,11 @@
 #include <QMouseEvent>
+#include <QMessageBox>
+#include <QMenu>
 #include "serviceswindow.h"
 #include "ui_serviceswindow.h"
 #include "serviceframe.h"
 #include "technologyframe.h"
+#include "iconproducer.h"
 
 ServicesWindow::ServicesWindow(QWidget *parent) :
     QDialog(parent),
@@ -33,6 +36,7 @@ ServicesWindow::ServicesWindow(QWidget *parent) :
 
     onServicesChanged(ObjectPropertiesList(managerInterface.GetServices()), QList<QDBusObjectPath>());
     setMouseTracking(true);
+    setupTrayIcon();
 }
 
 ServicesWindow::~ServicesWindow()
@@ -146,6 +150,38 @@ void ServicesWindow::onFrameReleased()
     if (frame == pressedFrame) {
         pressedFrame->click();
     }
+}
+
+void ServicesWindow::toggleShow()
+{
+    setVisible(! isVisible());
+}
+
+void ServicesWindow::about()
+{
+    QMessageBox::about(0,
+                       tr("About"),
+                       tr( "<p>"
+                           "  <b>LXQt Connman Client</b>"
+                           "</p>"
+                           "<p>"
+                           "Copyright 2014, 2015"
+                           "</p>"
+                           "<p>"
+                           "Christian Surlykke"
+                           "</p>"
+                           ));
+}
+
+void ServicesWindow::setupTrayIcon()
+{
+    QMenu *menu = new QMenu();
+    menu->addAction(tr("Services..."), this, SLOT(show()));
+    menu->addAction(QIcon::fromTheme("help-about"), tr("About"), this, SLOT(about()));
+    menu->addAction(QIcon::fromTheme("application-exit"), tr("Quit"), qApp, SLOT(quit()));
+    systemTrayIcon.setContextMenu(menu);
+    systemTrayIcon.setIcon(IconProducer::instance()->disconnected());
+    systemTrayIcon.show();
 }
 
 void ServicesWindow::getSelected(int &m, int &n)

@@ -27,7 +27,6 @@
 
 #include "agent.h"
 #include "serviceswindow.h"
-#include "systemtray.h"
 
 int main(int argc, char *argv[])
 {
@@ -42,11 +41,6 @@ int main(int argc, char *argv[])
     Q_UNUSED(agent)
 
     ServicesWindow servicesWindow;
-    SystemTray tray;
-    QObject::connect(&tray, SIGNAL(leftClicked()), &servicesWindow, SLOT(toggleShow()));
-    QObject::connect(&tray, SIGNAL(showServicesWindow()), &servicesWindow, SLOT(show()));
-
-    tray.show();
 
     return a.exec();
 }

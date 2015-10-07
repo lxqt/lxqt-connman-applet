@@ -5,6 +5,8 @@
 #include <QMap>
 #include <QHash>
 #include <QMouseEvent>
+#include <QSystemTrayIcon>
+
 #include "dbus_types.h"
 #include "net.connman.Manager.h"
 #include "clickableframe.h"
@@ -34,8 +36,11 @@ private slots:
     void onFrameLeft();
     void onFramePressed();
     void onFrameReleased();
+    void toggleShow();
+    void about();
 
 private:
+    void setupTrayIcon();
     void getSelected(int &m, int &n);
     void up(int &m, int &n);
     void down(int &m, int &n);
@@ -43,6 +48,7 @@ private:
     void select(ClickableFrame *frame);
     void select(int m, int n);
 
+    QSystemTrayIcon systemTrayIcon;
     NetConnmanManagerInterface managerInterface;
 
     Ui::ServicesWindow *ui;
