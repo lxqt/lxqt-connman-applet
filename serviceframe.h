@@ -18,6 +18,8 @@ public:
     ~ServiceFrame();
 
     virtual void click();
+    bool connected();
+    int signalStrength();
 
 signals:
     void stateChanged();

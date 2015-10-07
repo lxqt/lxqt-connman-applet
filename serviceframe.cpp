@@ -24,22 +24,33 @@ ServiceFrame::~ServiceFrame()
 
 void ServiceFrame::click()
 {
-    QString state = properties["State"].toString();
-    if (state == "idle" || state == "failure") {
+    if (state() == "idle" || state() == "failure") {
         serviceInterface.Connect();
     }
-    else if (state == "association" ||
-             state == "configuration" ||
-             state == "ready" ||
-             state == "online") {
+    else if (state() == "association" ||
+             state() == "configuration" ||
+             state() == "ready" ||
+             state() == "online") {
         serviceInterface.Disconnect();
     }
 }
 
+bool ServiceFrame::connected()
+{
+    return state() == "ready" || state() == "online";
+}
+
+int ServiceFrame::signalStrength()
+{
+    return type() == "wifi" ? properties["Strength"].toInt() : -1;
+}
 
 void ServiceFrame::onPropertyChanged(const QString &name, const QDBusVariant &value)
 {
     properties[name] = value.variant();
+    if (name == "State") {
+        emit stateChanged();
+    }
     updateUI();
 }
 

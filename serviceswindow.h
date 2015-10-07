@@ -36,8 +36,9 @@ private slots:
     void onFrameLeft();
     void onFramePressed();
     void onFrameReleased();
-    void toggleShow();
+    void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
     void about();
+    void updateTrayIcon();
 
 private:
     void setupTrayIcon();

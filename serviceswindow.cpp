@@ -118,6 +118,7 @@ void ServicesWindow::onServicesChanged(ObjectPropertiesList changed, QList<QDBus
             connect(services[path], SIGNAL(left()), SLOT(onFrameLeft()));
             connect(services[path], SIGNAL(pressed()), SLOT(onFramePressed()));
             connect(services[path], SIGNAL(released()), SLOT(onFrameReleased()));
+            connect(services[path], SIGNAL(stateChanged()), SLOT(updateTrayIcon()));
         }
         ui->servicesLayout->addWidget(services[path]);
     }
@@ -152,9 +153,11 @@ void ServicesWindow::onFrameReleased()
     }
 }
 
-void ServicesWindow::toggleShow()
+void ServicesWindow::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    setVisible(! isVisible());
+    if (reason == QSystemTrayIcon::Trigger) {
+        setVisible(! isVisible());
+    }
 }
 
 void ServicesWindow::about()
@@ -179,10 +182,32 @@ void ServicesWindow::setupTrayIcon()
     menu->addAction(tr("Services..."), this, SLOT(show()));
     menu->addAction(QIcon::fromTheme("help-about"), tr("About"), this, SLOT(about()));
     menu->addAction(QIcon::fromTheme("application-exit"), tr("Quit"), qApp, SLOT(quit()));
+    connect(&systemTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+                             SLOT(onTrayIconActivated(QSystemTrayIcon::ActivationReason)));
     systemTrayIcon.setContextMenu(menu);
-    systemTrayIcon.setIcon(IconProducer::instance()->disconnected());
+    updateTrayIcon();
     systemTrayIcon.show();
 }
+
+void ServicesWindow::updateTrayIcon()
+{
+    QIcon icon = IconProducer::instance()->disconnected();
+
+    for (int i = 0; i < ui->servicesLayout->count(); i++) {
+        ServiceFrame *frame = dynamic_cast<ServiceFrame*>(ui->servicesLayout->itemAt(i)->widget());
+        if (frame->connected())
+            if (frame->signalStrength() >= 0) {
+                icon = IconProducer::instance()->wireless(frame->signalStrength());
+            }
+            else {
+                icon = IconProducer::instance()->wired_connected();
+            }
+        break;
+    }
+
+    systemTrayIcon.setIcon(icon);
+}
+
 
 void ServicesWindow::getSelected(int &m, int &n)
 {
