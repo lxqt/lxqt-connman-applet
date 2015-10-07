@@ -2,6 +2,7 @@
 #define SERVICEFRAME_H
 
 #include <QVariantMap>
+#include <QTimer>
 #include "clickableframe.h"
 #include "net.connman.Service.h"
 
@@ -26,6 +27,7 @@ signals:
 
 private slots:
     void onPropertyChanged(const QString& name, const QDBusVariant& value);
+    void onErrorTimeout();
 
 private:
     void updateUI();

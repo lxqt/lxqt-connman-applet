@@ -44,6 +44,14 @@ QMap<QString, QString> buildMap() {
 	map["P2P"] = QObject::tr("Peer-to-peer");
 	map["Bluetooth"] = QObject::tr("Bluetooth");
 
+    map["out-of-range"] = QObject::tr("Out of range");
+    map["pin-missing"] = QObject::tr("Pin code missing");
+    map["dhcp-failed"] = QObject::tr("DHCP failed");
+    map["connect-failed"] = QObject::tr("Connection failed");
+    map["login-failed"] = QObject::tr("Login failed");
+    map["auth-failed"] = QObject::tr("Authentication failed");
+    map["invalid-key"] = QObject::tr("Invalid key");
+
 	return map;
 }
 

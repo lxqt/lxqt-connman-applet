@@ -15,6 +15,7 @@ ServiceFrame::ServiceFrame(QString path, const QVariantMap &properties, QWidget 
     connect(&serviceInterface, SIGNAL(PropertyChanged(QString,QDBusVariant)),
                                SLOT(onPropertyChanged(QString,QDBusVariant)));
     updateUI();
+    ui->errorLabel->hide();
 }
 
 ServiceFrame::~ServiceFrame()
@@ -52,6 +53,10 @@ void ServiceFrame::onPropertyChanged(const QString &name, const QDBusVariant &va
         emit stateChanged();
     }
     updateUI();
+}
+
+void ServiceFrame::onErrorTimeout() {
+    ui->errorLabel->hide();
 }
 
 void ServiceFrame::updateUI()
@@ -97,13 +102,17 @@ void ServiceFrame::updateUI()
     if (state() == "idle" || state() == "online") {
         ui->stateLabel->hide();
     }
+    else if (state() == "failure") {
+            ui->errorLabel->setText(string(properties["Error"].toString()));
+            ui->errorLabel->show();
+            QTimer::singleShot(4000, this, SLOT(onErrorTimeout()));
+        }
     else {
+        ui->stateLabel->setText(string(state()));
         ui->stateLabel->show();
-        if (state() == "failure") {
-            ui->stateLabel->setText(properties["Error"].toString());
-        }
-        else{
-            ui->stateLabel->setText(string(state()));
-        }
+    }
+
+    if (state() != "idle" && state() != "failure") {
+        ui->errorLabel->hide();
     }
 }
