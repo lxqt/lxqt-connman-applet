@@ -30,7 +30,7 @@ ServicesWindow::ServicesWindow(QWidget *parent) :
             SIGNAL(ServicesChanged(ObjectPropertiesList,QList<QDBusObjectPath>)),
             SLOT(onServicesChanged(ObjectPropertiesList,QList<QDBusObjectPath>)));
 
-    for (ObjectProperties pathPropsPair : ObjectPropertiesList(managerInterface.GetTechnologies())) {
+    foreach (ObjectProperties pathPropsPair, ObjectPropertiesList(managerInterface.GetTechnologies())) {
         onTechnologyAdded(pathPropsPair.first, pathPropsPair.second);
     }
 
@@ -102,13 +102,13 @@ void ServicesWindow::onServicesChanged(ObjectPropertiesList changed, QList<QDBus
         ui->servicesLayout->takeAt(0);
     }
 
-    for (QDBusObjectPath path : removed) {
+    foreach (QDBusObjectPath path, removed) {
         if (services.contains(path.path())) {
             services.take(path.path())->deleteLater();
         }
     }
 
-    for (ObjectProperties pathPropPair : changed) {
+    foreach (ObjectProperties pathPropPair, changed) {
         QString path = pathPropPair.first.path();
         QVariantMap props = pathPropPair.second;
         servicePaths.append(path);
