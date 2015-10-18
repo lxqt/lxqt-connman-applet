@@ -4,6 +4,33 @@
 #include "iconproducer.h"
 #include "strings.h"
 
+
+const QString ServiceFrame::stylesheetWifiOnline =
+       "QLabel#iconLabel"
+       "{"
+       "  background-color: rgb(200,200,200);"
+       "  border-width: 1px;"
+       "  border-style: solid;"
+       "  border-radius: 8px; "
+       "}";
+
+const QString ServiceFrame::stylesheetWifiReady =
+       "QLabel#iconLabel"
+       "{"
+       "  background-color: rgb(200,200,200);"
+       "  border-radius: 8px; "
+       "}";
+
+
+const QString ServiceFrame::stylesheetOtherOnline =
+       "QLabel#iconLabel"
+       "{"
+       "  border-width: 1px;"
+       "  border-style: solid;"
+       "  border-radius: 8px; "
+       "}";
+
+
 ServiceFrame::ServiceFrame(QString path, const QVariantMap &properties, QWidget *parent) :
     ClickableFrame(parent),
     ui(new Ui::ServiceFrame),
@@ -63,25 +90,34 @@ void ServiceFrame::updateUI()
 {
     if (type() == "wifi")
     {
-        QString styleSheet = "";
         QIcon icon;
         int strength = properties["Strength"].toInt();
         icon = IconProducer::instance()->wireless(strength);
-        if (state() == "online") {
-            styleSheet =
-                    "QLabel#iconLabel"
-                    "{"
-                    "  background-color: rgb(200,200,200);"
-                    "  border-width: 1px;" "  border-style: solid;"
-                    "  border-radius: 8px; "
-                    "}";
-        }
         ui->iconLabel->setPixmap(icon.pixmap(30,30));
-        ui->iconLabel->setStyleSheet(styleSheet);
+        if (state() == "online") {
+            ui->iconLabel->setStyleSheet(stylesheetWifiOnline);
+        }
+        else if (state() == "ready") {
+            ui->iconLabel->setStyleSheet(stylesheetWifiReady);
+        }
+        else {
+            ui->iconLabel->setStyleSheet("");
+        }
     }
     else {
-        QString iconText = state() == "online" ? QString(QChar(0x2713)) : "";
-        ui->iconLabel->setText(iconText);
+        if (state() == "online" || state() == "ready") {
+            ui->iconLabel->setText(QString(QChar(0x2713))); // Checkmark
+        }
+        else {
+            ui->iconLabel->clear();
+        }
+
+        if (state() == "online") {
+            ui->iconLabel->setStyleSheet(stylesheetOtherOnline);
+        }
+        else {
+            ui->iconLabel->setStyleSheet("");
+        }
     }
 
 
@@ -99,7 +135,7 @@ void ServiceFrame::updateUI()
         ui->nameLabel->setText(name);
     }
 
-    if (state() == "idle" || state() == "online") {
+    if (state() == "idle" || state() == "ready" || state() == "online") {
         ui->stateLabel->hide();
     }
     else if (state() == "failure") {

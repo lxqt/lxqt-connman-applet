@@ -35,6 +35,10 @@ private:
     QString type() { return properties["Type"].toString(); }
     QString state() { return properties["State"].toString(); }
 
+    static const QString stylesheetWifiReady;
+    static const QString stylesheetWifiOnline;
+    static const QString stylesheetOtherOnline;
+
     Ui::ServiceFrame *ui;
     QVariantMap properties;
     NetConnmanServiceInterface serviceInterface;
