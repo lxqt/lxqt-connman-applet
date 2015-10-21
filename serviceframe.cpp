@@ -8,8 +8,8 @@
 const QString ServiceFrame::stylesheetWifiOnline =
        "QLabel#iconLabel"
        "{"
-       "  background-color: rgb(200,200,200);"
-       "  border-width: 1px;"
+       "  background-color: rgb(230,230,230);"
+       "  border-width: 2px;"
        "  border-style: solid;"
        "  border-radius: 8px; "
        "}";
@@ -17,7 +17,7 @@ const QString ServiceFrame::stylesheetWifiOnline =
 const QString ServiceFrame::stylesheetWifiReady =
        "QLabel#iconLabel"
        "{"
-       "  background-color: rgb(200,200,200);"
+       "  background-color: rgb(230,230,230);"
        "  border-radius: 8px; "
        "}";
 
@@ -25,7 +25,7 @@ const QString ServiceFrame::stylesheetWifiReady =
 const QString ServiceFrame::stylesheetOtherOnline =
        "QLabel#iconLabel"
        "{"
-       "  border-width: 1px;"
+       "  border-width: 2px;"
        "  border-style: solid;"
        "  border-radius: 8px; "
        "}";
