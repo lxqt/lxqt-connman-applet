@@ -108,5 +108,16 @@ QString Agent::Introspect()
 
 QString Agent::getName(QDBusObjectPath servicePath)
 {
+    NetConnmanManagerInterface managerInterface("net.connman", "/", QDBusConnection::systemBus());
+    ObjectPropertiesList opl = managerInterface.GetServices();
+    foreach ( ObjectProperties op, opl)
+    {
+        if (op.first == servicePath)
+        {
+            return op.second["Name"].toString();
+        }
+    }
+
+    return QString();
 
 }
