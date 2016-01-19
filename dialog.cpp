@@ -25,7 +25,7 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QLineEdit>
-
+#include <QDebug>
 #include "strings.h"
 
 #include "dialog.h"
@@ -55,9 +55,13 @@ QVariantMap Dialog::collectedInput()
 
     foreach (QString key, inputFields.keys())
     {
-        collected[key] = inputFields[key]->text(); // FIXME Handle bytearrays
+        if (!inputFields[key]->text().trimmed().isEmpty())
+        {
+            collected[key] = inputFields[key]->text(); // FIXME Handle bytearrays
+        }
     }
 
+    qDebug() << "Dialog returning: " << collected << "\n";
     return collected;
 }
 
