@@ -6,6 +6,7 @@
 #include "serviceframe.h"
 #include "technologyframe.h"
 #include "iconproducer.h"
+#include "iconviewer.h"
 
 ServicesWindow::ServicesWindow(QWidget *parent) :
     QDialog(parent),
@@ -29,6 +30,7 @@ ServicesWindow::ServicesWindow(QWidget *parent) :
     connect(&managerInterface,
             SIGNAL(ServicesChanged(ObjectPropertiesList,QList<QDBusObjectPath>)),
             SLOT(onServicesChanged(ObjectPropertiesList,QList<QDBusObjectPath>)));
+    connect(IconProducer::instance(), SIGNAL(iconsChanged()), this, SLOT(updateTrayIcon()));
 
     foreach (ObjectProperties pathPropsPair, ObjectPropertiesList(managerInterface.GetTechnologies())) {
         onTechnologyAdded(pathPropsPair.first, pathPropsPair.second);
@@ -37,6 +39,11 @@ ServicesWindow::ServicesWindow(QWidget *parent) :
     onServicesChanged(ObjectPropertiesList(managerInterface.GetServices()), QList<QDBusObjectPath>());
     setMouseTracking(true);
     setupTrayIcon();
+
+    /*Only for checking iconproducer logic
+    IconViewer *iconViewer = new IconViewer(this);
+    iconViewer->show();*/
+
 }
 
 ServicesWindow::~ServicesWindow()
@@ -46,9 +53,6 @@ ServicesWindow::~ServicesWindow()
 
 void ServicesWindow::keyReleaseEvent(QKeyEvent *event)
 {
-    qDebug() << "Release: " << event->key() << ", text:" << event->text();
-    qDebug() << "'k'" << (int) 'k';
-    qDebug() << "arrow-up" << Qt::UpArrow;
     int m,n;
     getSelected(m, n);
     if (event->key() == Qt::Key_Return ||
@@ -191,21 +195,20 @@ void ServicesWindow::setupTrayIcon()
 
 void ServicesWindow::updateTrayIcon()
 {
-    QIcon icon = IconProducer::instance()->disconnected();
-
     for (int i = 0; i < ui->servicesLayout->count(); i++) {
         ServiceFrame *frame = dynamic_cast<ServiceFrame*>(ui->servicesLayout->itemAt(i)->widget());
-        if (frame->connected())
+        if (frame->connected()) {
             if (frame->signalStrength() >= 0) {
-                icon = IconProducer::instance()->wireless(frame->signalStrength());
+                systemTrayIcon.setIcon(IconProducer::instance()->wireless(frame->signalStrength()));
             }
             else {
-                icon = IconProducer::instance()->wired_connected();
+                systemTrayIcon.setIcon(IconProducer::instance()->wiredConnected());
             }
-        break;
+            return;
+        }
     }
 
-    systemTrayIcon.setIcon(icon);
+    systemTrayIcon.setIcon(IconProducer::instance()->disconnected());
 }
 
 

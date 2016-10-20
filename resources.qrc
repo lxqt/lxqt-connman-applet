@@ -8,5 +8,7 @@
         <file>resources/signal-strength-2.svg</file>
         <file>resources/signal-strength-3.svg</file>
         <file>resources/signal-strength-4.svg</file>
+        <file>resources/wired-connected.svg</file>
+        <file>resources/wired-disconnected.svg</file>
     </qresource>
 </RCC>

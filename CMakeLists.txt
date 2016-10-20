@@ -19,6 +19,7 @@ endif (NOT CMAKE_BUILD_TYPE)
 
 file(GLOB SRCS *.cpp clickableframe.h *.xml *.qrc *ui)
 
+set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 

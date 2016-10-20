@@ -61,7 +61,6 @@ QVariantMap Dialog::collectedInput()
         }
     }
 
-    qDebug() << "Dialog returning: " << collected << "\n";
     return collected;
 }
 

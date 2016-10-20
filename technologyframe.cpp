@@ -23,7 +23,6 @@ TechnologyFrame::~TechnologyFrame()
 void TechnologyFrame::click()
 {
     bool newPowered = !(properties["Powered"].toBool());
-    qDebug() << "Setting powered to:"  << newPowered;
     technologyInterface.SetProperty("Powered", QDBusVariant(newPowered));
 }
 

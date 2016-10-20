@@ -40,75 +40,47 @@ IconProducer* IconProducer::instance()
 
 IconProducer::IconProducer()
 {
-    mBuilt_in_wireless_signal_none      = buildIcon(":/resources/signal-strength-0.svg");
-    mBuilt_in_wireless_signal_weak      = buildIcon(":/resources/signal-strength-1.svg");
-    mBuilt_in_wireless_signal_ok        = buildIcon(":/resources/signal-strength-2.svg");
-    mBuilt_in_wireless_signal_good      = buildIcon(":/resources/signal-strength-3.svg");
-    mBuilt_in_wireless_signal_excellent = buildIcon(":/resources/signal-strength-4.svg");
+    mBuiltInDisconnected = buildIcon(":/resources/wired-disconnected.svg");
+    mBuiltInWiredConnected = buildIcon(":/resources/wired-connected.svg");
+    mBuiltInWirelessNone = buildIcon(":/resources/signal-strength-0.svg");
+    mBuiltInWirelessWeak = buildIcon(":/resources/signal-strength-1.svg");
+    mBuiltInWirelessOk = buildIcon(":/resources/signal-strength-2.svg");
+    mBuiltInWirelessGood = buildIcon(":/resources/signal-strength-3.svg");
+    mBuiltInWirelessExcellent = buildIcon(":/resources/signal-strength-4.svg");
 
     connect(LXQt::GlobalSettings::globalSettings(), SIGNAL(iconThemeChanged()), this, SLOT(onIconThemeChanged()));
     onIconThemeChanged();
 }
 
-IconProducer::~IconProducer()
-{
-}
-
 void IconProducer::onIconThemeChanged()
 {
-    qDebug() << "themeName:" << QIcon::themeName();
-
-    if (QIcon::themeName() == "oxygen")
+    qDebug() << "Iconproducer::onIconThemeChanged...";
+    // Oxygen and Breeze has these
+    if (QIcon::hasThemeIcon("network-connect") &&
+        QIcon::hasThemeIcon("network-wired") &&
+        QIcon::hasThemeIcon("network-wireless-connected-00") &&
+        QIcon::hasThemeIcon("network-wireless-connected-25") &&
+        QIcon::hasThemeIcon("network-wireless-connected-50") &&
+        QIcon::hasThemeIcon("network-wireless-connected-75") &&
+        QIcon::hasThemeIcon("network-wireless-connected-100"))
     {
-        mWired_connected = QIcon::fromTheme("network-connect");
-        mDisconnected = QIcon::fromTheme("network-wired");
-
-        mWireless_signal_none      = QIcon::fromTheme("network-wireless-connected-00");
-        mWireless_signal_weak      = QIcon::fromTheme("network-wireless-connected-25");
-        mWireless_signal_ok        = QIcon::fromTheme("network-wireless-connected-50");
-        mWireless_signal_good      = QIcon::fromTheme("network-wireless-connected-75");
-        mWireless_signal_excellent = QIcon::fromTheme("network-wireless-connected-100");
+        iconThemeType = IconThemeType::oxygen;
     }
-    else
+    else if (// Most other themes has these
+             QIcon::hasThemeIcon("network-offline") && // Gnome (and others) uses these
+             QIcon::hasThemeIcon("network-wired") &&
+             QIcon::hasThemeIcon("network-wireless-signal-none-symbolic") && // Gnome (and others) uses these
+             QIcon::hasThemeIcon("network-wireless-signal-weak-symbolic") &&
+             QIcon::hasThemeIcon("network-wireless-signal-ok-symbolic") &&
+             QIcon::hasThemeIcon("network-wireless-signal-good-symbolic") &&
+             QIcon::hasThemeIcon("network-wireless-signal-excellent-symbolic"))
     {
-        // Most themes other than oxygen seems to have these two
-        mDisconnected = QIcon::fromTheme("network-offline");
-        mWired_connected = QIcon::fromTheme("network-wired");
-
-        if (QIcon::hasThemeIcon("network-wireless-signal-none-symbolic") && // Gnome (and others) uses these
-            QIcon::hasThemeIcon("network-wireless-signal-weak-symbolic") &&
-            QIcon::hasThemeIcon("network-wireless-signal-ok-symbolic") &&
-            QIcon::hasThemeIcon("network-wireless-signal-good-symbolic") &&
-            QIcon::hasThemeIcon("network-wireless-signal-excellent-symbolic"))
-        {
-            mWireless_signal_none =      QIcon::fromTheme("network-wireless-signal-none-symbolic");
-            mWireless_signal_weak =      QIcon::fromTheme("network-wireless-signal-weak-symbolic");
-            mWireless_signal_ok =        QIcon::fromTheme("network-wireless-signal-ok-symbolic");
-            mWireless_signal_good =      QIcon::fromTheme("network-wireless-signal-good-symbolic");
-            mWireless_signal_excellent = QIcon::fromTheme("network-wireless-signal-excellent-symbolic");
-        }
-        else if (QIcon::hasThemeIcon("network-wireless-signal-none") &&   // AwOken (and others) uses these
-                QIcon::hasThemeIcon("network-wireless-signal-weak") &&
-                QIcon::hasThemeIcon("network-wireless-signal-ok") &&
-                QIcon::hasThemeIcon("network-wireless-signal-good") &&
-                QIcon::hasThemeIcon("network-wireless-signal-excellent"))
-        {
-        mWireless_signal_none =      QIcon::fromTheme("network-wireless-signal-none");
-        mWireless_signal_weak =      QIcon::fromTheme("network-wireless-signal-weak");
-        mWireless_signal_ok =        QIcon::fromTheme("network-wireless-signal-ok");
-        mWireless_signal_good =      QIcon::fromTheme("network-wireless-signal-good");
-        mWireless_signal_excellent = QIcon::fromTheme("network-wireless-signal-excellent");
-        }
-        else // Fallback to ugly built-in icons
-        {
-            mWireless_signal_none = mBuilt_in_wireless_signal_none;
-            mWireless_signal_weak = mBuilt_in_wireless_signal_weak;
-            mWireless_signal_ok = mBuilt_in_wireless_signal_ok;
-            mWireless_signal_good = mBuilt_in_wireless_signal_good;
-            mWireless_signal_excellent = mBuilt_in_wireless_signal_excellent;
-        }
+        iconThemeType = IconThemeType::gnome;
     }
-
+    else // Fallback to ugly built-in icons
+    {
+        iconThemeType = IconThemeType::none;
+    }
     emit iconsChanged();
 }
 
@@ -127,11 +99,45 @@ QIcon IconProducer::buildIcon(QString pathToSvgFile)
     return QIcon(pixmap);
 }
 
-QIcon& IconProducer::wireless(int strength)
+QIcon IconProducer::disconnected()
 {
-    if (strength < 10)      return mWireless_signal_none;
-    else if (strength < 37) return mWireless_signal_weak;
-    else if (strength < 63) return mWireless_signal_ok;
-    else if (strength < 90) return mWireless_signal_good;
-    else                    return mWireless_signal_excellent;
+    switch (iconThemeType) {
+    case IconThemeType::oxygen: return QIcon::fromTheme("network-wired");
+    case IconThemeType::gnome: return QIcon::fromTheme("network-offline");
+    case IconThemeType::none: return mBuiltInDisconnected;
+    }
+}
+
+QIcon IconProducer::wiredConnected()
+{
+    switch (iconThemeType) {
+    case IconThemeType::oxygen: return QIcon::fromTheme("network-connect");
+    case IconThemeType::gnome: return QIcon::fromTheme("network-wired");
+    case IconThemeType::none: return mBuiltInWiredConnected;
+    }
+}
+
+QIcon IconProducer::wireless(int strength)
+{
+    switch (iconThemeType) {
+    case IconThemeType::oxygen:
+        if (strength < 10)      return QIcon::fromTheme("network-wireless-connected-00");
+        else if (strength < 37) return QIcon::fromTheme("network-wireless-connected-25");
+        else if (strength < 63) return QIcon::fromTheme("network-wireless-connected-50");
+        else if (strength < 90) return QIcon::fromTheme("network-wireless-connected-75");
+        else                    return QIcon::fromTheme("network-wireless-connected-100");
+    case IconThemeType::gnome:
+        if (strength < 10)      return QIcon::fromTheme("network-wireless-signal-none-symbolic");
+        else if (strength < 37) return QIcon::fromTheme("network-wireless-signal-weak-symbolic");
+        else if (strength < 63) return QIcon::fromTheme("network-wireless-signal-ok-symbolic");
+        else if (strength < 90) return QIcon::fromTheme("network-wireless-signal-good-symbolic");
+        else                    return QIcon::fromTheme("network-wireless-signal-excellent-symbolic");
+    case IconThemeType::none:
+        if (strength < 10)      return mBuiltInWirelessNone;
+        else if (strength < 37) return mBuiltInWirelessWeak;
+        else if (strength < 63) return mBuiltInWirelessOk;
+        else if (strength < 90) return mBuiltInWirelessGood;
+        else                    return mBuiltInWirelessExcellent;
+
+    }
 }

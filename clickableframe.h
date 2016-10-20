@@ -22,8 +22,8 @@ signals:
 protected:
     virtual void enterEvent(QEvent* event) { emit entered(); }
     virtual void leaveEvent(QEvent* event) { emit left(); }
-    virtual void mousePressEvent(QMouseEvent *event) { qDebug() << "press" <<  this << event->pos(); emit pressed(); }
-    virtual void mouseReleaseEvent(QMouseEvent *event) { qDebug() << "release" <<  this << event->pos(); emit released(); }
+    virtual void mousePressEvent(QMouseEvent *event) { emit pressed(); }
+    virtual void mouseReleaseEvent(QMouseEvent *event) { emit released(); }
 };
 
 #endif // CLICKABLEFRAME_H

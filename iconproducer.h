@@ -25,6 +25,7 @@
 #ifndef ICONPRODUCER_H
 #define ICONPRODUCER_H
 #include <QIcon>
+#include <QMap>
 
 class IconProducer : public QObject
 {
@@ -33,9 +34,16 @@ class IconProducer : public QObject
 public:
     static IconProducer* instance();
 
-    QIcon& disconnected() { return mDisconnected; }
-    QIcon& wired_connected() { return mWired_connected; }
-    QIcon& wireless(int strength);
+    enum class IconThemeType
+    {
+        oxygen,
+        gnome,
+        none
+    };
+
+    QIcon disconnected();
+    QIcon wiredConnected();
+    QIcon wireless(int signalStrength);
 
 signals:
     void iconsChanged();
@@ -45,26 +53,16 @@ private slots:
 
 private:
     IconProducer();
-    ~IconProducer();
+    IconThemeType iconThemeType;
+    QIcon mBuiltInDisconnected;
+    QIcon mBuiltInWiredConnected;
+    QIcon mBuiltInWirelessNone;
+    QIcon mBuiltInWirelessWeak;
+    QIcon mBuiltInWirelessOk;
+    QIcon mBuiltInWirelessGood;
+    QIcon mBuiltInWirelessExcellent;
 
     QIcon buildIcon(QString pathToSvgFile);
-
-    QIcon mWired_connected;
-    QIcon mDisconnected;
-
-    QIcon mWireless_signal_none;
-    QIcon mWireless_signal_weak;
-    QIcon mWireless_signal_ok;
-    QIcon mWireless_signal_good;
-    QIcon mWireless_signal_excellent;
-
-    QIcon mBuilt_in_wireless_signal_none;
-    QIcon mBuilt_in_wireless_signal_weak;
-    QIcon mBuilt_in_wireless_signal_ok;
-    QIcon mBuilt_in_wireless_signal_good;
-    QIcon mBuilt_in_wireless_signal_excellent;
-
-
 };
 
 
