@@ -54,10 +54,9 @@ IconProducer::IconProducer()
 
 void IconProducer::onIconThemeChanged()
 {
-    qDebug() << "Iconproducer::onIconThemeChanged...";
     // Oxygen and Breeze has these
-    if (QIcon::hasThemeIcon("network-connect") &&
-        QIcon::hasThemeIcon("network-wired") &&
+    if (QIcon::hasThemeIcon("network-wired") &&
+        QIcon::hasThemeIcon("network-connect") &&
         QIcon::hasThemeIcon("network-wireless-connected-00") &&
         QIcon::hasThemeIcon("network-wireless-connected-25") &&
         QIcon::hasThemeIcon("network-wireless-connected-50") &&
@@ -66,10 +65,10 @@ void IconProducer::onIconThemeChanged()
     {
         iconThemeType = IconThemeType::oxygen;
     }
-    else if (// Most other themes has these
-             QIcon::hasThemeIcon("network-offline") && // Gnome (and others) uses these
+    else if (// Gnome and several other themes has these
+             QIcon::hasThemeIcon("network-offline") &&
              QIcon::hasThemeIcon("network-wired") &&
-             QIcon::hasThemeIcon("network-wireless-signal-none-symbolic") && // Gnome (and others) uses these
+             QIcon::hasThemeIcon("network-wireless-signal-none-symbolic") &&
              QIcon::hasThemeIcon("network-wireless-signal-weak-symbolic") &&
              QIcon::hasThemeIcon("network-wireless-signal-ok-symbolic") &&
              QIcon::hasThemeIcon("network-wireless-signal-good-symbolic") &&
