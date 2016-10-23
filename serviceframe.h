@@ -27,10 +27,10 @@ signals:
 
 private slots:
     void onPropertyChanged(const QString& name, const QDBusVariant& value);
+    void updateUI();
     void onErrorTimeout();
 
 private:
-    void updateUI();
 
     QString type() { return properties["Type"].toString(); }
     QString state() { return properties["State"].toString(); }

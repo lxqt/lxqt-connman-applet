@@ -41,6 +41,7 @@ ServiceFrame::ServiceFrame(QString path, const QVariantMap &properties, QWidget 
     setMouseTracking(true);
     connect(&serviceInterface, SIGNAL(PropertyChanged(QString,QDBusVariant)),
                                SLOT(onPropertyChanged(QString,QDBusVariant)));
+    connect(IconProducer::instance(), SIGNAL(iconsChanged()), SLOT(updateUI()));
     updateUI();
     ui->errorLabel->hide();
 }
