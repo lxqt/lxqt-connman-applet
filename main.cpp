@@ -26,6 +26,7 @@
 #include <QDebug>
 
 #include "agent.h"
+#include "controller.h"
 #include "serviceswindow.h"
 
 int main(int argc, char *argv[])
@@ -37,10 +38,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
 
-    Agent agent;
-    Q_UNUSED(agent)
-
-    ServicesWindow servicesWindow;
+    Controller controller;
+    Q_UNUSED(controller)
 
     return a.exec();
 }
