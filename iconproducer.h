@@ -44,6 +44,7 @@ public:
     QIcon disconnected() const;
     QIcon wiredConnected() const;
     QIcon wireless(int signalStrength) const;
+    QIcon blanc() const;
 
 signals:
     void iconsChanged();
@@ -61,6 +62,7 @@ private:
     QIcon mBuiltInWirelessOk;
     QIcon mBuiltInWirelessGood;
     QIcon mBuiltInWirelessExcellent;
+    QIcon mBlanc;
 
     QIcon buildIcon(QString pathToSvgFile);
 };

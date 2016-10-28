@@ -13,6 +13,12 @@ ServicesWindow::ServicesWindow(QAbstractItemModel* technologiesListModel,
     ui->setupUi(this);
     ui->technologiesListView->setModel(technologiesListModel);
     ui->servicesListView->setModel(servicesListModel);
+
+    connect(ui->technologiesListView, SIGNAL(activated(const QModelIndex&)),
+            technologiesListModel, SLOT(onTechnologyActivated(const QModelIndex&)));
+
+    connect(ui->servicesListView, SIGNAL(activated(const QModelIndex&)),
+            servicesListModel, SLOT(onServiceActivated(const QModelIndex&)));
 }
 
 ServicesWindow::~ServicesWindow()

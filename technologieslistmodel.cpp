@@ -1,6 +1,8 @@
 #include <QDebug>
 #include <QDBusReply>
+#include <QFont>
 #include "dbus_types.h"
+#include "iconproducer.h"
 #include "technologieslistmodel.h"
 
 TechnologiesListModel::TechnologiesListModel(QObject *parent) :
@@ -26,6 +28,32 @@ QVariant TechnologiesListModel::data(const QModelIndex& index, int role) const
         switch(role) {
         case Qt::DisplayRole:
             return technology["Name"];
+        case Qt::DecorationRole:
+            if (technology["Type"] == "ethernet") {
+                return IconProducer::instance().wiredConnected();
+            }
+            else if (technology["Type"] == "wifi") {
+                return IconProducer::instance().wireless(80);
+            }
+            else {
+                return IconProducer::instance().blanc();
+            }
+        case Qt::FontRole:
+            if (technology["Powered"].toBool()) {
+                return QVariant();
+            }
+            else {
+                QFont font;
+                font.setItalic(true);
+                return font;
+            }
+        case Qt::ForegroundRole:
+             if (technology["Powered"].toBool()) {
+                return QVariant();
+            }
+            else {
+                return QColor("lightgrey");
+            }
         default:
             return QVariant();
         }
@@ -47,8 +75,8 @@ void TechnologiesListModel::onTechnologyAdded(const QDBusObjectPath& path, const
     }
 
     ConnmanObject* technology = new ConnmanObject(path.path(), "net.connman.Technology");
-    connect(technology, SIGNAL(PropertyChanged(const QString&, const QVariant&)),
-                        SLOT(onTechnologyPropertyChanged(const QString&, const QVariant&)));
+    connect(technology, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)),
+                        SLOT(onTechnologyPropertyChanged(const QString&, const QDBusVariant&)));
     for (const QString& key : properties.keys()) {
         (*technology)[key] = properties[key];
     }
@@ -69,9 +97,18 @@ void TechnologiesListModel::onTechnologyRemoved(const QDBusObjectPath& path)
     }
 }
 
-void TechnologiesListModel::onTechnologyPropertyChanged(const QString& name, const QVariant& newValue)
+void TechnologiesListModel::onTechnologyPropertyChanged(const QString& name, const QDBusVariant& newValue)
 {
-    qDebug() << "technology updated: " << name << " -> " << newValue;
     ConnmanObject& technology = *dynamic_cast<ConnmanObject*>(sender());
-    technology[name] = newValue;
+    technology[name] = newValue.variant();
+    emit layoutChanged();
+}
+
+void TechnologiesListModel::onTechnologyActivated(const QModelIndex& index)
+{
+    if (index.isValid() && index.row() < technologies.size()) {
+        ConnmanObject& technology = *technologies[index.row()];
+        bool newPowered = !(technology["Powered"].toBool());
+        technology.asyncCall("SetProperty", QVariant("Powered"), QVariant::fromValue(QDBusVariant(newPowered)));
+    }
 }

@@ -17,7 +17,7 @@ public:
     ConnmanObject(const QString& path, const char* interface, QObject* parent = 0);
 
 Q_SIGNALS:
-   void PropertyChanged(const QString& name, const QVariant& newValue);
+   void PropertyChanged(const QString& name, const QDBusVariant& newValue);
 };
 
 class ConnmanManager : public ConnmanObject

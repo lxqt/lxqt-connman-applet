@@ -22,7 +22,8 @@ public:
 
 public slots:
     void onServicesChanged(ObjectPropertiesList added, const QList<QDBusObjectPath>& removed);
-    void onServiceUpdated(const QString& name, const QVariant& newValue);
+    void onServiceUpdated(const QString& name, const QDBusVariant& newValue);
+    void onServiceActivated(const QModelIndex& index);
 
 private:
     QMap<QString, ConnmanObject*> services;

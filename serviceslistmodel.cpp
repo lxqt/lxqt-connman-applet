@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QDBusReply>
+#include <QFont>
 #include "dbus_types.h"
 #include "iconproducer.h"
 #include "serviceslistmodel.h"
@@ -26,7 +27,21 @@ QVariant ServicesListModel::data(const QModelIndex& index, int role) const
         const ConnmanObject& service = *services[serviceOrder[index.row()]];
         switch(role) {
         case Qt::DisplayRole:
-            return service["Name"];
+            if (service["State"] == "online") {
+                return service["Name"].toString() + " " + QChar(0x2713);
+            }
+            else {
+                return  service["Name"].toString();
+            }
+        case Qt::FontRole:
+            if (service["State"] == "ready" || service["State"] == "online") {
+                QFont font;
+                font.setBold(true);
+                return font;
+            }
+            else {
+                return QVariant();
+            }
         case Qt::DecorationRole:
             if (service["Type"] == "wifi") {
                 return IconProducer::instance().wireless(service["Strength"].toInt());
@@ -65,22 +80,35 @@ void ServicesListModel::onServicesChanged(ObjectPropertiesList added, const QLis
         ConnmanObject*& service = services[path];
         if (service == 0) {
             service = new ConnmanObject(op.first.path(), "net.connman.Service");
-            connect(service, SIGNAL(PropertyChanged(const QString&, const QVariant&)),
-                             SLOT(onServiceUpdated(const QString&, const QVariant&)));
-        }
-        for (const QString& key : properties.keys()) {
-            (*service)[key] = properties[key];
-        }
-        (*services[op.first.path()])["__position"] = serviceOrder.size() - 1;
+            connect(service, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)),
+                             SLOT(onServiceUpdated(const QString&, const QDBusVariant&)));
+            for (const QString& key : properties.keys()) {
+                (*service)[key] = properties[key];
+            }
+         }
+         (*services[op.first.path()])["__position"] = serviceOrder.size() - 1;
     }
     emit layoutChanged();
 }
 
-void ServicesListModel::onServiceUpdated(const QString& name, const QVariant& newValue)
+void ServicesListModel::onServiceUpdated(const QString& name, const QDBusVariant& newValue)
 {
-    qDebug() << "service updated: " << name << ", " << newValue;
     ConnmanObject& service = *dynamic_cast<ConnmanObject*>(sender());
-    service[name] = newValue;
+    service[name] = newValue.variant();
     int row = service["__position"].toInt();
     emit dataChanged(createIndex(row, 0), createIndex(row, 0));
+}
+
+void ServicesListModel::onServiceActivated(const QModelIndex& index)
+{
+    if (index.isValid() && index.row() < serviceOrder.size()) {
+        ConnmanObject& service = *services[serviceOrder[index.row()]];
+        QString state = service["State"].toString();
+        if (state == "idle" || state == "failure") {
+            service.asyncCall("Connect");
+        }
+        else if (state == "association" || state == "configuration" || state == "ready" || state == "online") {
+            service.asyncCall("Disconnect");
+        }
+    }
 }

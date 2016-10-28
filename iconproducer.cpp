@@ -47,6 +47,10 @@ IconProducer::IconProducer()
     mBuiltInWirelessGood = buildIcon(":/resources/signal-strength-3.svg");
     mBuiltInWirelessExcellent = buildIcon(":/resources/signal-strength-4.svg");
 
+    QPixmap pixmap(30,30);
+    pixmap.fill(QColor(0,0,0,0));
+    mBlanc = QIcon(pixmap);
+
     connect(LXQt::GlobalSettings::globalSettings(), SIGNAL(iconThemeChanged()), this, SLOT(onIconThemeChanged()));
     onIconThemeChanged();
 }
@@ -138,4 +142,9 @@ QIcon IconProducer::wireless(int strength) const
         else                    return mBuiltInWirelessExcellent;
 
     }
+}
+
+QIcon IconProducer::blanc() const
+{
+    return mBlanc;
 }

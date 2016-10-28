@@ -24,7 +24,8 @@ public:
 public slots:
     void onTechnologyAdded(const QDBusObjectPath& path, const QVariantMap& properties);
     void onTechnologyRemoved(const QDBusObjectPath& path);
-    void onTechnologyPropertyChanged(const QString& name, const QVariant& newValue);
+    void onTechnologyPropertyChanged(const QString& name, const QDBusVariant& newValue);
+    void onTechnologyActivated(const QModelIndex& index);
 
 private:
     QVector<ConnmanObject*> technologies;
