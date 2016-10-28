@@ -41,9 +41,9 @@ public:
         none
     };
 
-    QIcon disconnected();
-    QIcon wiredConnected();
-    QIcon wireless(int signalStrength);
+    QIcon disconnected() const;
+    QIcon wiredConnected() const;
+    QIcon wireless(int signalStrength) const;
 
 signals:
     void iconsChanged();

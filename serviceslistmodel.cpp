@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QDBusReply>
 #include "dbus_types.h"
+#include "iconproducer.h"
 #include "serviceslistmodel.h"
 
 ServicesListModel::ServicesListModel(QObject* parent) :

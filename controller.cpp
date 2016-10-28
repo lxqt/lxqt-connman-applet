@@ -1,4 +1,5 @@
 #include <QDBusReply>
+#include "iconproducer.h"
 #include "controller.h"
 
 Controller::Controller() :
@@ -18,6 +19,8 @@ Controller::Controller() :
             SIGNAL(ServicesChanged(ObjectPropertiesList, const QList<QDBusObjectPath>&)),
             &servicesListModel,
             SLOT(onServicesChanged(const ObjectPropertiesList&,  const QList<QDBusObjectPath>&)));
+
+    connect(& IconProducer::instance(), SIGNAL(iconsChanged()), &servicesListModel, SIGNAL(layoutChanged()));
 
     QDBusReply<ObjectPropertiesList> GetTechnologiesReply = manager.call("GetTechnologies");;
     for (ObjectProperties op : GetTechnologiesReply.value()) {
