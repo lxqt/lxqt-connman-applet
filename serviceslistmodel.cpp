@@ -21,25 +21,30 @@ int ServicesListModel::rowCount(const QModelIndex& parent) const
 
 QVariant ServicesListModel::data(const QModelIndex& index, int role) const
 {
-    if (index.isValid() && index.row() < serviceOrder.size() && role == Qt::DisplayRole) {
-        QString servicePath = serviceOrder[index.row()];
-        return (*services[servicePath])["Name"];
+    if (index.isValid() && index.row() < serviceOrder.size()) {
+        const ConnmanObject& service = *services[serviceOrder[index.row()]];
+        switch(role) {
+        case Qt::DisplayRole:
+            return service["Name"];
+        case Qt::DecorationRole:
+            if (service["Type"] == "wifi") {
+                return IconProducer::instance().wireless(service["Strength"].toInt());
+            }
+            else {
+                // TODO: This means that everything else than wifi is depicted as wired. We should
+                // do something for bluetooth...
+                return service["State"] == "offline" ? IconProducer::instance().disconnected() :
+                                                       IconProducer::instance().wiredConnected();
+            }
+        default:
+            return QVariant();
+        }
+
     }
     else {
         return QVariant();
     }
 }
-
-QVariant ServicesListModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (section == 0 && orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-        return "Services";
-    }
-    else {
-        return QVariant();
-    }
-}
-
 
 void ServicesListModel::onServicesChanged(ObjectPropertiesList added, const QList<QDBusObjectPath>& removed)
 {

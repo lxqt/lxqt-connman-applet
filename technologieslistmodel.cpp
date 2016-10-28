@@ -21,24 +21,19 @@ int TechnologiesListModel::rowCount(const QModelIndex& parent) const
 
 QVariant TechnologiesListModel::data(const QModelIndex& index, int role) const
 {
-    if (index.isValid() && index.row() < technologies.size() && role == Qt::DisplayRole) {
-        return (*technologies[index.row()])["Name"];
+    if (index.isValid() && index.row() < technologies.size()) {
+        ConnmanObject& technology = *technologies[index.row()];
+        switch(role) {
+        case Qt::DisplayRole:
+            return technology["Name"];
+        default:
+            return QVariant();
+        }
     }
     else  {
         return QVariant();
     }
 }
-
-QVariant TechnologiesListModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (section == 0 && orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-        return "Connection types";
-    }
-    else {
-        return QVariant();
-    }
-}
-
 
 void TechnologiesListModel::onTechnologyAdded(const QDBusObjectPath& path, const QVariantMap& properties)
 {
@@ -55,7 +50,6 @@ void TechnologiesListModel::onTechnologyAdded(const QDBusObjectPath& path, const
     connect(technology, SIGNAL(PropertyChanged(const QString&, const QVariant&)),
                         SLOT(onTechnologyPropertyChanged(const QString&, const QVariant&)));
     for (const QString& key : properties.keys()) {
-        qDebug() << "Set prop:" << key << "->" << properties[key];
         (*technology)[key] = properties[key];
     }
     beginInsertRows(QModelIndex(), i, i);
@@ -65,14 +59,10 @@ void TechnologiesListModel::onTechnologyAdded(const QDBusObjectPath& path, const
 
 void TechnologiesListModel::onTechnologyRemoved(const QDBusObjectPath& path)
 {
-    qDebug() << "Technology removed: " << path.path() << ", size: " << technologies.size();
     for (int i = 0; i < technologies.size(); i++) {
-        qDebug() << "Looking at: " << technologies[i]->path();
         if (path.path() == technologies[i]->path()) {
-            qDebug() << "Found the sucker, removing at " << i;
             emit layoutAboutToBeChanged();
             technologies.takeAt(i)->deleteLater();
-            qDebug() << "size now: " << technologies.size();
             emit layoutChanged();
             return;
         }

@@ -32,7 +32,7 @@ class IconProducer : public QObject
     Q_OBJECT
 
 public:
-    static IconProducer* instance();
+    static const IconProducer& instance();
 
     enum class IconThemeType
     {

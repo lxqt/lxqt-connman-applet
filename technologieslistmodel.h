@@ -20,7 +20,6 @@ public:
     virtual ~TechnologiesListModel();
     virtual int rowCount(const QModelIndex& parent) const;
     virtual QVariant data(const QModelIndex& index, int role) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
 public slots:
     void onTechnologyAdded(const QDBusObjectPath& path, const QVariantMap& properties);

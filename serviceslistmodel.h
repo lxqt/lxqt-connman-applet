@@ -19,7 +19,6 @@ public:
     virtual ~ServicesListModel();
     virtual int rowCount(const QModelIndex& parent) const;
     virtual QVariant data(const QModelIndex& index, int role) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
 public slots:
     void onServicesChanged(ObjectPropertiesList added, const QList<QDBusObjectPath>& removed);

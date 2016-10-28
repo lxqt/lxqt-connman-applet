@@ -30,11 +30,10 @@
 #include <QFile>
 #include <QDebug>
 
-IconProducer* IconProducer::instance()
+const IconProducer& IconProducer::instance()
 {
-    static IconProducer *_inst = new IconProducer();
-
-    return _inst;
+    static IconProducer inst;
+    return inst;
 }
 
 
@@ -98,7 +97,7 @@ QIcon IconProducer::buildIcon(QString pathToSvgFile)
     return QIcon(pixmap);
 }
 
-QIcon IconProducer::disconnected()
+QIcon IconProducer::disconnected() const
 {
     switch (iconThemeType) {
     case IconThemeType::oxygen: return QIcon::fromTheme("network-wired");
@@ -107,7 +106,7 @@ QIcon IconProducer::disconnected()
     }
 }
 
-QIcon IconProducer::wiredConnected()
+QIcon IconProducer::wiredConnected() const
 {
     switch (iconThemeType) {
     case IconThemeType::oxygen: return QIcon::fromTheme("network-connect");
@@ -116,7 +115,7 @@ QIcon IconProducer::wiredConnected()
     }
 }
 
-QIcon IconProducer::wireless(int strength)
+QIcon IconProducer::wireless(int strength) const
 {
     switch (iconThemeType) {
     case IconThemeType::oxygen:
