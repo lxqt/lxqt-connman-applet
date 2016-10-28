@@ -3,7 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QVector>
-#include "dbus_types.h"
+#include "connmannobject.h"
 
 struct ServicesListModelPrivate;
 
@@ -19,13 +19,16 @@ public:
     virtual ~ServicesListModel();
     virtual int rowCount(const QModelIndex& parent) const;
     virtual QVariant data(const QModelIndex& index, int role) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
 public slots:
     void onServicesChanged(ObjectPropertiesList added, const QList<QDBusObjectPath>& removed);
-    void onServiceUpdated(const QString& name, const QDBusVariant& newValue);
+    void onServiceUpdated(const QString& name, const QVariant& newValue);
 
 private:
-    ServicesListModelPrivate* modelData;
+    QMap<QString, ConnmanObject*> services;
+    QVector<QString> serviceOrder;
+
 };
 
 #endif // SERVICESLISTMODEL_H

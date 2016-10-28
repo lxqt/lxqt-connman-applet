@@ -27,11 +27,11 @@
 
 #include <QMetaType>
 #include <QMap>
-#include <QDBusInterface>
-#include <QDBusObjectPath>
 #include <QVariantMap>
 #include <QDBusMetaType>
 #include <QDBusConnection>
+#include <QDBusObjectPath>
+#include <QDBusAbstractInterface>
 #include <QDebug>
 
 typedef QPair<QDBusObjectPath, QVariantMap> ObjectProperties;
@@ -40,31 +40,17 @@ typedef QList<ObjectProperties> ObjectPropertiesList;
 Q_DECLARE_METATYPE(ObjectProperties)
 Q_DECLARE_METATYPE(ObjectPropertiesList)
 
+void registerDbusTypes();
 QDebug operator<<(QDebug debug, const QDBusObjectPath &path);
 
-struct RemoteObject : public QDBusInterface
-{
-    RemoteObject(const QString& path, const QString& interface, const QVariantMap& initialProperties);
-    QVariantMap properties;
-};
-
-struct Service : public RemoteObject
-{
-    Service(const QString& path, const QVariantMap& initialProperties);
-};
-
-struct Technology : public RemoteObject
-{
-    Technology(const QString& path, const QVariantMap& initialProperties);
-};
-
-struct Manager : public RemoteObject
-{
-    Manager();
-};
 
 
 
+// Debugging
+
+void show(const ObjectPropertiesList& opl);
+
+void show(const QList<QDBusObjectPath>& paths);
 
 
 #endif // DBUS_TYPES_H

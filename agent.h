@@ -25,12 +25,9 @@
 #ifndef AGENT_H
 #define AGENT_H
 
-#include <QDBusContext>
-#include <QDBusObjectPath>
 #include <QDebug>
-#include "net.connman.Manager.h"
 
-class Agent : public QObject, protected QDBusContext
+class Agent : public QObject
 {
     Q_OBJECT
 public:
@@ -38,20 +35,17 @@ public:
 
     void Release();
     void Cancel();
-    void ReportError(QDBusObjectPath service, QString errorMessage);
-    void ReportPeerError(QDBusObjectPath peer, QString errorMessage);
-    void RequestBrowser(QDBusObjectPath service, QString url);
-    QVariantMap RequestInput(QDBusObjectPath servicePath, QVariantMap fields);
-    QVariantMap RequestPeerAuthorization(QDBusObjectPath peer, QVariantMap fields);
-    QString Introspect();
+    void ReportError(QString service, QString errorMessage);
+    void ReportPeerError(QString peer, QString errorMessage);
+    void RequestBrowser(QString servicePath, QString url);
+    QVariantMap RequestInput(QString servicePath, QVariantMap fields);
+    QVariantMap RequestPeerAuthorization(QString peer, QVariantMap fields);
 
 signals:
     void operationCanceled();
 
 private:
-    QString getName(QDBusObjectPath servicePath);
-    NetConnmanManagerInterface managerInterface;
-    QDBusObjectPath path;
+    QString getName(QString servicePath);
 };
 
 #endif // AGENT_H

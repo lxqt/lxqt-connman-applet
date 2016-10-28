@@ -25,15 +25,13 @@
 #include <QApplication>
 #include <QDebug>
 
-#include "agent.h"
+#include "dbus_types.h"
 #include "controller.h"
 #include "serviceswindow.h"
 
 int main(int argc, char *argv[])
 {
-    qDBusRegisterMetaType<ObjectProperties>();
-    qDBusRegisterMetaType<ObjectPropertiesList>();
-    qDBusRegisterMetaType<QList<QDBusObjectPath> >();
+    registerDbusTypes();
 
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);

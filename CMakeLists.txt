@@ -28,23 +28,13 @@ find_package(Qt5DBus REQUIRED QUIET)
 
 qt5_add_resources(QRCS_GENERATED ${QRCS})
 
-qt5_add_dbus_adaptor(DBUS_GENERATED net.connman.Agent.xml agent.h Agent)
-
-set_source_files_properties(net.connman.Manager.xml PROPERTIES INCLUDE dbus_types.h)
-qt5_add_dbus_interface(DBUS_GENERATED net.connman.Manager.xml net.connman.Manager)
-qt5_add_dbus_interface(DBUS_GENERATED net.connman.Service.xml net.connman.Service)
-qt5_add_dbus_interface(DBUS_GENERATED net.connman.Technology.xml net.connman.Technology)
-
-
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${QTXDG_INCLUDE_DIRS}
 )
 
-
 set(APP_SHARE_DIR share/lxqt/${PROJECT_NAME})
-
 
 # Translations **********************************
 include(LXQtTranslate)

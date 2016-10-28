@@ -1,18 +1,13 @@
-#include "net.connman.Manager.h"
+#include <QDBusReply>
 #include "controller.h"
 
 Controller::Controller() :
-    manager("net.connman", "/", QDBusConnection::systemBus()),
+    manager(),
     technologiesListModel(),
     servicesListModel(),
     servicesWindow(&technologiesListModel, &servicesListModel),
     trayIcon()
 {
-    void ServicesChanged(ObjectPropertiesList changed, const QList<QDBusObjectPath> &removed);
-    void TechnologyAdded(const QDBusObjectPath &path, const QVariantMap &properties);
-    void TechnologyRemoved(const QDBusObjectPath &path);
-
-
     connect(&manager, SIGNAL(TechnologyAdded(const QDBusObjectPath&, const QVariantMap&)),
             &technologiesListModel, SLOT(onTechnologyAdded(const QDBusObjectPath&, const QVariantMap&)));
 
@@ -24,12 +19,12 @@ Controller::Controller() :
             &servicesListModel,
             SLOT(onServicesChanged(const ObjectPropertiesList&,  const QList<QDBusObjectPath>&)));
 
-    QDBusReply<ObjectPropertiesList> GetTechnologiesReply = manager.GetTechnologies();
+    QDBusReply<ObjectPropertiesList> GetTechnologiesReply = manager.call("GetTechnologies");;
     for (ObjectProperties op : GetTechnologiesReply.value()) {
         technologiesListModel.onTechnologyAdded(op.first, op.second);
     }
 
-    QDBusReply<ObjectPropertiesList> GetServicesReply = manager.GetServices();
+    QDBusReply<ObjectPropertiesList> GetServicesReply = manager.call("GetServices");
     servicesListModel.onServicesChanged(GetServicesReply.value(), QList<QDBusObjectPath>());
 
     servicesWindow.show();

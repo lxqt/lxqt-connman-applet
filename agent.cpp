@@ -22,28 +22,14 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
-#include <QDBusObjectPath>
 #include <QDebug>
 
 #include "agent.h"
-#include "agentadaptor.h"
 #include "dialog.h"
 
-Agent::Agent() :
-    QObject(),
-    path("/org/lxqt/lxqt_connman_agent"),
-    managerInterface("net.connman", "/", QDBusConnection::systemBus())
+Agent::Agent() : QObject()
 {
-    QDBusConnection::systemBus().registerService("org.lxqt.lxqt_connman_agent");
-
-    new AgentAdaptor(this);
-    new IntrospectableAdaptor(this);
-
-    QDBusConnection::systemBus().registerObject(path.path(), this);
-
-    managerInterface.RegisterAgent(path);
-
- }
+}
 
 void Agent::Release()
 {
@@ -55,27 +41,27 @@ void Agent::Cancel()
     qDebug() << "Canceled";
 }
 
-void Agent::ReportError(QDBusObjectPath service, QString errorMessage)
+void Agent::ReportError(QString service, QString errorMessage)
 {
     // FIXME
 }
 
-void Agent::ReportPeerError(QDBusObjectPath peer, QString errorMessage)
+void Agent::ReportPeerError(QString peer, QString errorMessage)
 {
     // FIXME
 }
 
-void Agent::RequestBrowser(QDBusObjectPath service, QString url)
+void Agent::RequestBrowser(QString servicePath, QString url)
 {
     // FIXME
 }
 
-QVariantMap Agent::RequestInput(QDBusObjectPath servicePath, QVariantMap fields)
+QVariantMap Agent::RequestInput(QString servicePath, QVariantMap fields)
 {
     QString serviceName = getName(servicePath);
     if (serviceName.isEmpty())
     {
-        sendErrorReply("net.connman.Agent.Error.Canceled", "Unknown service");
+        //sendErrorReply("net.connman.Agent.Error.Canceled", "Unknown service");
         return QVariantMap();
     }
 
@@ -84,40 +70,20 @@ QVariantMap Agent::RequestInput(QDBusObjectPath servicePath, QVariantMap fields)
 
     if (Dialog::Rejected == infoDialog.exec())
     {
-        sendErrorReply("net.connman.Agent.Error.Canceled", "Cancelled");
+        //sendErrorReply("net.connman.Agent.Error.Canceled", "Cancelled");
         return QVariantMap();
     }
 
     return infoDialog.collectedInput();
 }
 
-QVariantMap Agent::RequestPeerAuthorization(QDBusObjectPath peer, QVariantMap fields)
+QVariantMap Agent::RequestPeerAuthorization(QString peer, QVariantMap fields)
 {
     return QVariantMap(); // FIXME
 }
 
-
-QString Agent::Introspect()
+QString Agent::getName(QString servicePath)
 {
-    qDebug() << "Introspect...";
-    QFile xmlFile(":/interface/net.connman.Agent.xml");
-    xmlFile.open(QIODevice::ReadOnly);
-    QString xml(xmlFile.readAll());
-    return xml;
-}
-
-QString Agent::getName(QDBusObjectPath servicePath)
-{
-    NetConnmanManagerInterface managerInterface("net.connman", "/", QDBusConnection::systemBus());
-    ObjectPropertiesList opl = managerInterface.GetServices();
-    foreach ( ObjectProperties op, opl)
-    {
-        if (op.first == servicePath)
-        {
-            return op.second["Name"].toString();
-        }
-    }
-
-    return QString();
+    return QString(); // FIXME
 
 }

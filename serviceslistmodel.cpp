@@ -1,80 +1,80 @@
 #include <QDebug>
 #include <QDBusReply>
-#include "net.connman.Service.h"
 #include "dbus_types.h"
 #include "serviceslistmodel.h"
 
-struct ServicesListModelPrivate
-{
-    QMap<QString, Service*> services;
-    QVector<QString> serviceOrder;
-
-};
-
 ServicesListModel::ServicesListModel(QObject* parent) :
     QAbstractListModel(parent),
-    modelData(new ServicesListModelPrivate())
+    services(),
+    serviceOrder()
 {
 }
 
 ServicesListModel::~ServicesListModel()
 {
-    delete modelData;
 }
 
 int ServicesListModel::rowCount(const QModelIndex& parent) const
 {
-    return parent.isValid() ? 0 : modelData->serviceOrder.size();
+    return parent.isValid() ? 0 : serviceOrder.size();
 }
 
 QVariant ServicesListModel::data(const QModelIndex& index, int role) const
 {
-    if (index.isValid() && index.row() < modelData->serviceOrder.size() && role == Qt::DisplayRole) {
-        QString servicePath = modelData->serviceOrder[index.row()];
-        return modelData->services[servicePath]->properties["Name"];
+    if (index.isValid() && index.row() < serviceOrder.size() && role == Qt::DisplayRole) {
+        QString servicePath = serviceOrder[index.row()];
+        return (*services[servicePath])["Name"];
     }
     else {
         return QVariant();
     }
 }
 
+QVariant ServicesListModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (section == 0 && orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+        return "Services";
+    }
+    else {
+        return QVariant();
+    }
+}
+
+
 void ServicesListModel::onServicesChanged(ObjectPropertiesList added, const QList<QDBusObjectPath>& removed)
 {
-    qDebug() << "services changed: " << added;
     emit layoutAboutToBeChanged();
     for (QDBusObjectPath path : removed)
     {
-        if (modelData->services.contains(path.path()))
+        if (services.contains(path.path()))
         {
-            modelData->services.take(path.path())->deleteLater();
+            services.take(path.path())->deleteLater();
         }
     }
-    modelData->serviceOrder.clear();
+    serviceOrder.clear();
     for (ObjectProperties op: added) {
-        modelData->serviceOrder.append(op.first.path());
-        if (! modelData->services.contains(op.first.path()))
-        {
-            Service* service = new Service(op.first.path(), op.second);
-            connect(service, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)),
-                             SLOT(onServiceUpdated(const QString&, const QDBusVariant&)));
-            modelData->services[op.first.path()] = service;
+        QString path = op.first.path();
+        const QVariantMap& properties = op.second;
+        serviceOrder.append(path);
+        ConnmanObject*& service = services[path];
+        if (service == 0) {
+            service = new ConnmanObject(op.first.path(), "net.connman.Service");
+            connect(service, SIGNAL(PropertyChanged(const QString&, const QVariant&)),
+                             SLOT(onServiceUpdated(const QString&, const QVariant&)));
         }
-        modelData->services[op.first.path()]->properties["__position"] = modelData->serviceOrder.size() - 1;
-    }
-    qDebug() << "services now: ";
-    for (const QString& path : modelData->services.keys())
-    {
-        QVariantMap& properties = modelData->services[path]->properties;
-        qDebug() << path << "-> { name: '" << properties["Name"].toString() << "', state:" << properties["State"].toString() << "'}";
+        for (const QString& key : properties.keys()) {
+            (*service)[key] = properties[key];
+        }
+        (*services[op.first.path()])["__position"] = serviceOrder.size() - 1;
     }
     emit layoutChanged();
 }
 
-void ServicesListModel::onServiceUpdated(const QString& name, const QDBusVariant& newValue)
+void ServicesListModel::onServiceUpdated(const QString& name, const QVariant& newValue)
 {
-    qDebug() << "service updated: " << name << ", " << newValue.variant();
-    Service* service = dynamic_cast<Service*>(sender());
-    service->properties[name] = newValue.variant();
-    int row = service->properties["__position"].toInt();
+    qDebug() << "service updated: " << name << ", " << newValue;
+    ConnmanObject& service = *dynamic_cast<ConnmanObject*>(sender());
+    service[name] = newValue;
+    int row = service["__position"].toInt();
     emit dataChanged(createIndex(row, 0), createIndex(row, 0));
 }

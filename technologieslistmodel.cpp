@@ -1,76 +1,87 @@
 #include <QDebug>
 #include <QDBusReply>
 #include "dbus_types.h"
-#include "net.connman.Technology.h"
 #include "technologieslistmodel.h"
-
-struct TechnologiesListModelPrivate
-{
-    QVector<Technology*> technologies;
-};
 
 TechnologiesListModel::TechnologiesListModel(QObject *parent) :
     QAbstractListModel(parent),
-    modelData(new TechnologiesListModelPrivate())
+    technologies()
 {
 }
 
 TechnologiesListModel::~TechnologiesListModel()
 {
-    delete(modelData);
 }
 
 int TechnologiesListModel::rowCount(const QModelIndex& parent) const
 {
-    return parent.isValid() ? 0 : modelData->technologies.size();
+    return parent.isValid() ? 0 : technologies.size();
 }
 
 
 QVariant TechnologiesListModel::data(const QModelIndex& index, int role) const
 {
-    if (index.isValid() && index.row() < modelData->technologies.size() && role == Qt::DisplayRole) {
-        return modelData->technologies[index.row()]->properties["Name"];
+    if (index.isValid() && index.row() < technologies.size() && role == Qt::DisplayRole) {
+        return (*technologies[index.row()])["Name"];
     }
     else  {
         return QVariant();
     }
 }
 
+QVariant TechnologiesListModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (section == 0 && orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+        return "Connection types";
+    }
+    else {
+        return QVariant();
+    }
+}
+
+
 void TechnologiesListModel::onTechnologyAdded(const QDBusObjectPath& path, const QVariantMap& properties)
 {
     int i = 0;
-    while (i < modelData->technologies.size() && path.path() < modelData->technologies[i]->path()) {
+    while (i < technologies.size() && path.path() < technologies[i]->path()) {
         i++;
     }
 
-    if (i < modelData->technologies.size() && path.path() == modelData->technologies[i]->path()) {
+    if (i < technologies.size() && path.path() == technologies[i]->path()) {
         return;
     }
 
-    Technology* technology = new Technology(path.path(), properties);
-    connect(technology, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)),
-                        SLOT(onTechnologyUpdated(const QString&, const QDBusVariant&)));
-
+    ConnmanObject* technology = new ConnmanObject(path.path(), "net.connman.Technology");
+    connect(technology, SIGNAL(PropertyChanged(const QString&, const QVariant&)),
+                        SLOT(onTechnologyPropertyChanged(const QString&, const QVariant&)));
+    for (const QString& key : properties.keys()) {
+        qDebug() << "Set prop:" << key << "->" << properties[key];
+        (*technology)[key] = properties[key];
+    }
     beginInsertRows(QModelIndex(), i, i);
-    modelData->technologies.insert(i, technology);
+    technologies.insert(i, technology);
     endInsertRows();
 }
 
 void TechnologiesListModel::onTechnologyRemoved(const QDBusObjectPath& path)
 {
-    for (int i = 0; i < modelData->technologies.size(); i++) {
-        if (path.path() == modelData->technologies[i]->path()) {
-           beginRemoveColumns(QModelIndex(), i, i);
-           modelData->technologies.takeAt(i)->deleteLater();
-           endRemoveRows();
-           return;
+    qDebug() << "Technology removed: " << path.path() << ", size: " << technologies.size();
+    for (int i = 0; i < technologies.size(); i++) {
+        qDebug() << "Looking at: " << technologies[i]->path();
+        if (path.path() == technologies[i]->path()) {
+            qDebug() << "Found the sucker, removing at " << i;
+            emit layoutAboutToBeChanged();
+            technologies.takeAt(i)->deleteLater();
+            qDebug() << "size now: " << technologies.size();
+            emit layoutChanged();
+            return;
         }
     }
 }
 
-void TechnologiesListModel::onTechnologyUpdated(const QString& name, const QDBusVariant& newValue)
+void TechnologiesListModel::onTechnologyPropertyChanged(const QString& name, const QVariant& newValue)
 {
-    qDebug() << "technology updated: " << name << " -> " << newValue.variant();
-    Technology* technology = dynamic_cast<Technology*>(sender());
-    technology->properties[name] = newValue.variant();
+    qDebug() << "technology updated: " << name << " -> " << newValue;
+    ConnmanObject& technology = *dynamic_cast<ConnmanObject*>(sender());
+    technology[name] = newValue;
 }

@@ -3,7 +3,7 @@
 
 #include <QApplication>
 #include <QSystemTrayIcon>
-#include "net.connman.Manager.h"
+#include "dbus_types.h"
 #include "technologieslistmodel.h"
 #include "serviceslistmodel.h"
 #include "serviceswindow.h"
@@ -14,7 +14,7 @@ class Controller : public QObject
 public:
     Controller();
 private:
-    NetConnmanManagerInterface manager;
+    ConnmanManager manager;
     TechnologiesListModel technologiesListModel;
     ServicesListModel servicesListModel;
     ServicesWindow servicesWindow;
