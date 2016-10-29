@@ -1,7 +1,4 @@
 <RCC>
-    <qresource prefix="/interface">
-        <file>net.connman.Agent.xml</file>
-    </qresource>
     <qresource prefix="/">
         <file>resources/signal-strength-0.svg</file>
         <file>resources/signal-strength-1.svg</file>
