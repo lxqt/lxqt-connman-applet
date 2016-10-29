@@ -4,6 +4,8 @@ set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS}")
 
 project(${PROJECT_NAME})
 
+add_subdirectory(iconviewer)
+
 find_package(lxqt REQUIRED QUIET)
 find_package(Qt5Xdg REQUIRED QUIET)
 find_package(Qt5Widgets REQUIRED)
