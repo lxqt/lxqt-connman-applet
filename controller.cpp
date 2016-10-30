@@ -1,11 +1,14 @@
 #include <QDBusReply>
 #include "iconproducer.h"
+#include "agentadaptor.h"
 #include "controller.h"
+
 
 Controller::Controller() :
     manager(),
     technologiesListModel(),
     servicesListModel(),
+    agent(),
     servicesWindow(&technologiesListModel, &servicesListModel),
     trayIcon()
 {
@@ -20,7 +23,9 @@ Controller::Controller() :
             &servicesListModel,
             SLOT(onServicesChanged(const ObjectPropertiesList&,  const QList<QDBusObjectPath>&)));
 
-    connect(& IconProducer::instance(), SIGNAL(iconsChanged()), &servicesListModel, SIGNAL(layoutChanged()));
+    connect(&IconProducer::instance(), SIGNAL(iconsChanged()), &servicesListModel, SIGNAL(layoutChanged()));
+
+    connect(&servicesListModel, &ServicesListModel::serviceNamed, &agent, &Agent::setEntityName);
 
     QDBusReply<ObjectPropertiesList> GetTechnologiesReply = manager.call("GetTechnologies");;
     for (ObjectProperties op : GetTechnologiesReply.value()) {
@@ -30,5 +35,11 @@ Controller::Controller() :
     QDBusReply<ObjectPropertiesList> GetServicesReply = manager.call("GetServices");
     servicesListModel.onServicesChanged(GetServicesReply.value(), QList<QDBusObjectPath>());
 
+    QDBusObjectPath agentPath("/org/lxqt/lxqt_connman_agent");
+    new AgentAdaptor(&agent);
+    QDBusConnection::systemBus().registerObject(agentPath.path(), &agent);
+    manager.call("RegisterAgent", QVariant::fromValue(agentPath));
+
     servicesWindow.show();
 }
+

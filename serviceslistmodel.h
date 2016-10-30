@@ -25,6 +25,9 @@ public slots:
     void onServiceUpdated(const QString& name, const QDBusVariant& newValue);
     void onServiceActivated(const QModelIndex& index);
 
+signals:
+    void serviceNamed(const QString& path, const QString& name);
+
 private:
     QMap<QString, ConnmanObject*> services;
     QVector<QString> serviceOrder;

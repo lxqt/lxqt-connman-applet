@@ -26,26 +26,33 @@
 #define AGENT_H
 
 #include <QDebug>
+#include <QDBusContext>
+#include <QDBusObjectPath>
+#include "connmannobject.h"
 
-class Agent : public QObject
+class Agent : public QObject, public QDBusContext
 {
     Q_OBJECT
+
 public:
     explicit Agent();
+    void setEntityName(const QString& path, const QString& name);
 
     void Release();
     void Cancel();
-    void ReportError(QString service, QString errorMessage);
-    void ReportPeerError(QString peer, QString errorMessage);
-    void RequestBrowser(QString servicePath, QString url);
-    QVariantMap RequestInput(QString servicePath, QVariantMap fields);
-    QVariantMap RequestPeerAuthorization(QString peer, QVariantMap fields);
+    void ReportError(QDBusObjectPath serviceName, QString errorMessage);
+    void ReportPeerError(QDBusObjectPath peerName, QString errorMessage);
+    void RequestBrowser(QDBusObjectPath serviceName, QString url);
+    QVariantMap RequestInput(QDBusObjectPath serviceName, QVariantMap fields);
+    QVariantMap RequestPeerAuthorization(QDBusObjectPath peerName, QVariantMap fields);
 
 signals:
     void operationCanceled();
 
 private:
-    QString getName(QString servicePath);
+    QString entityName(QDBusObjectPath entityPath);
+    QMap<QString, QString> entityNames;
+
 };
 
 #endif // AGENT_H

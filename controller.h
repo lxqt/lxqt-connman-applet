@@ -7,6 +7,7 @@
 #include "technologieslistmodel.h"
 #include "serviceslistmodel.h"
 #include "serviceswindow.h"
+#include "agent.h"
 
 class Controller : public QObject
 {
@@ -17,6 +18,7 @@ private:
     ConnmanManager manager;
     TechnologiesListModel technologiesListModel;
     ServicesListModel servicesListModel;
+    Agent agent;
     ServicesWindow servicesWindow;
     QSystemTrayIcon trayIcon;
 };

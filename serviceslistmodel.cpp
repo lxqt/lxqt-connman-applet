@@ -85,6 +85,9 @@ void ServicesListModel::onServicesChanged(ObjectPropertiesList added, const QLis
             for (const QString& key : properties.keys()) {
                 (*service)[key] = properties[key];
             }
+            if (service->contains("Name")) {
+                emit serviceNamed(path, (*service)["Name"].toString());
+            }
          }
          (*services[op.first.path()])["__position"] = serviceOrder.size() - 1;
     }
@@ -95,6 +98,9 @@ void ServicesListModel::onServiceUpdated(const QString& name, const QDBusVariant
 {
     ConnmanObject& service = *dynamic_cast<ConnmanObject*>(sender());
     service[name] = newValue.variant();
+    if (name == "Name") {
+        emit serviceNamed(name, newValue.variant().toString());
+    }
     int row = service["__position"].toInt();
     emit dataChanged(createIndex(row, 0), createIndex(row, 0));
 }

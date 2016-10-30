@@ -23,12 +23,23 @@
  * END_COMMON_COPYRIGHT_HEADER */
 
 #include <QDebug>
+#include <QDBusReply>
 
 #include "agent.h"
 #include "dialog.h"
 
-Agent::Agent() : QObject()
+Agent::Agent() : QObject(), entityNames()
 {
+}
+
+void Agent::setEntityName(const QString& path, const QString& name)
+{
+    entityNames[path] = name;
+}
+
+QString Agent::entityName(QDBusObjectPath entityPath)
+{
+    return entityNames.contains(entityPath.path()) ? entityNames.value(entityPath.path()) : entityPath.path();
 }
 
 void Agent::Release()
@@ -41,27 +52,27 @@ void Agent::Cancel()
     qDebug() << "Canceled";
 }
 
-void Agent::ReportError(QString service, QString errorMessage)
+void Agent::ReportError(QDBusObjectPath servicePath, QString errorMessage)
 {
     // FIXME
 }
 
-void Agent::ReportPeerError(QString peer, QString errorMessage)
+void Agent::ReportPeerError(QDBusObjectPath peerPath, QString errorMessage)
 {
     // FIXME
 }
 
-void Agent::RequestBrowser(QString servicePath, QString url)
+void Agent::RequestBrowser(QDBusObjectPath servicePath, QString url)
 {
     // FIXME
 }
 
-QVariantMap Agent::RequestInput(QString servicePath, QVariantMap fields)
+QVariantMap Agent::RequestInput(QDBusObjectPath servicePath, QVariantMap fields)
 {
-    QString serviceName = getName(servicePath);
+    QString serviceName = entityName(servicePath);
     if (serviceName.isEmpty())
     {
-        //sendErrorReply("net.connman.Agent.Error.Canceled", "Unknown service");
+        sendErrorReply("net.connman.Agent.Error.Canceled", "Unknown service");
         return QVariantMap();
     }
 
@@ -70,20 +81,13 @@ QVariantMap Agent::RequestInput(QString servicePath, QVariantMap fields)
 
     if (Dialog::Rejected == infoDialog.exec())
     {
-        //sendErrorReply("net.connman.Agent.Error.Canceled", "Cancelled");
+        sendErrorReply("net.connman.Agent.Error.Canceled", "Cancelled");
         return QVariantMap();
     }
-
     return infoDialog.collectedInput();
 }
 
-QVariantMap Agent::RequestPeerAuthorization(QString peer, QVariantMap fields)
+QVariantMap Agent::RequestPeerAuthorization(QDBusObjectPath peerPath, QVariantMap fields)
 {
     return QVariantMap(); // FIXME
-}
-
-QString Agent::getName(QString servicePath)
-{
-    return QString(); // FIXME
-
 }
