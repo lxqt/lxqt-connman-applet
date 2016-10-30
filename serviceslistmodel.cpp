@@ -25,16 +25,22 @@ QVariant ServicesListModel::data(const QModelIndex& index, int role) const
 {
     if (index.isValid() && index.row() < serviceOrder.size()) {
         const ConnmanObject& service = *services[serviceOrder[index.row()]];
+        QString state = service["State"].toString();
+        QString name = service["Name"].toString();
+        QString type = service["Type"].toString();
         switch(role) {
         case Qt::DisplayRole:
-            if (service["State"] == "online") {
+           if (state == "online") {
                 return service["Name"].toString() + " " + QChar(0x2713);
             }
+            else if  (state != "idle" && state != "ready"){
+                return name + " (" + state + ")";
+            }
             else {
-                return  service["Name"].toString();
+                return name;
             }
         case Qt::FontRole:
-            if (service["State"] == "ready" || service["State"] == "online") {
+            if (state == "ready" || state == "online") {
                 QFont font;
                 font.setBold(true);
                 return font;
@@ -43,14 +49,14 @@ QVariant ServicesListModel::data(const QModelIndex& index, int role) const
                 return QVariant();
             }
         case Qt::DecorationRole:
-            if (service["Type"] == "wifi") {
+            if (type == "wifi") {
                 return IconProducer::instance().wireless(service["Strength"].toInt());
             }
             else {
                 // TODO: This means that everything else than wifi is depicted as wired. We should
-                // do something for bluetooth...
-                return service["State"] == "offline" ? IconProducer::instance().disconnected() :
-                                                       IconProducer::instance().wiredConnected();
+                // do something for bluetooth, p2p ..
+                return state == "offline" ? IconProducer::instance().disconnected() :
+                                            IconProducer::instance().wiredConnected();
             }
         default:
             return QVariant();
