@@ -48,20 +48,23 @@ class ConnmanObject : public QDBusAbstractInterface, public QVariantMap
     Q_OBJECT
 
 public:
-    ConnmanObject(const QString& path, const char* interface, QObject* parent = 0) :
-        QDBusAbstractInterface("net.connman", path, interface, QDBusConnection::systemBus(), parent),
-        QVariantMap() {}
+    ConnmanObject(const QString& path, const char* interface, const QVariantMap properties = QVariantMap());
 
 Q_SIGNALS:
    void PropertyChanged(const QString& name, const QDBusVariant& newValue);
+
+protected slots:
+   virtual void onPropertyChanged(const QString& name, const QDBusVariant& newValue) {}
 };
+
+Q_DECLARE_METATYPE(ConnmanObject*)
 
 class ConnmanManager : public ConnmanObject
 {
     Q_OBJECT
 
 public:
-    ConnmanManager(QObject* parent = 0) : ConnmanObject("/", "net.connman.Manager", parent) {}
+    ConnmanManager(QObject* parent = 0) : ConnmanObject("/", "net.connman.Manager") {}
 
 Q_SIGNALS:
     void TechnologyAdded(const QDBusObjectPath& object, const QVariantMap& properties);

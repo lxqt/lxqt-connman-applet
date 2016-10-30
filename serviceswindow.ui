@@ -15,45 +15,20 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="technologiesLabel">
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
+    <widget class="QTreeView" name="treeView">
+     <property name="rootIsDecorated">
+      <bool>false</bool>
      </property>
-     <property name="text">
-      <string>Technologies</string>
+     <property name="itemsExpandable">
+      <bool>true</bool>
      </property>
+     <property name="expandsOnDoubleClick">
+      <bool>false</bool>
+     </property>
+     <attribute name="headerVisible">
+      <bool>false</bool>
+     </attribute>
     </widget>
-   </item>
-   <item>
-    <widget class="QListView" name="technologiesListView">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>186</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="servicesLabel">
-     <property name="font">
-      <font>
-       <pointsize>9</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Services</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QListView" name="servicesListView"/>
    </item>
   </layout>
  </widget>

@@ -4,21 +4,12 @@
 #include "serviceswindow.h"
 #include "ui_serviceswindow.h"
 
-ServicesWindow::ServicesWindow(QAbstractItemModel* technologiesListModel,
-                               QAbstractItemModel* servicesListModel,
-                               QWidget *parent) :
+ServicesWindow::ServicesWindow(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ServicesWindow)
 {
     ui->setupUi(this);
-    ui->technologiesListView->setModel(technologiesListModel);
-    ui->servicesListView->setModel(servicesListModel);
-
-    connect(ui->technologiesListView, SIGNAL(activated(const QModelIndex&)),
-            technologiesListModel, SLOT(onTechnologyActivated(const QModelIndex&)));
-
-    connect(ui->servicesListView, SIGNAL(activated(const QModelIndex&)),
-            servicesListModel, SLOT(onServiceActivated(const QModelIndex&)));
+    connect(ui->treeView, SIGNAL(activated(const QModelIndex&)), SIGNAL(activated(const QModelIndex&)));
 }
 
 ServicesWindow::~ServicesWindow()
@@ -26,18 +17,8 @@ ServicesWindow::~ServicesWindow()
     delete ui;
 }
 
-/*void ServicesWindow::about()
+void ServicesWindow::setModel(QAbstractItemModel* model)
 {
-    QMessageBox::about(0,
-                       tr("About"),
-                       tr( "<p>"
-                           "  <b>LXQt Connman Client</b>"
-                           "</p>"
-                           "<p>"
-                           "Copyright 2014, 2015"
-                           "</p>"
-                           "<p>"
-                           "Christian Surlykke"
-                           "</p>"
-                           ));
-}*/
+    ui->treeView->setModel(model);
+    ui->treeView->expandAll();
+}
