@@ -31,8 +31,6 @@
 
 int main(int argc, char *argv[])
 {
-    registerDbusTypes();
-
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
 

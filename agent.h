@@ -28,7 +28,6 @@
 #include <QDebug>
 #include <QDBusContext>
 #include <QDBusObjectPath>
-#include "connmannobject.h"
 
 class Agent : public QObject, public QDBusContext
 {

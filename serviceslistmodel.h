@@ -3,9 +3,6 @@
 
 #include <QAbstractListModel>
 #include <QVector>
-#include "connmannobject.h"
-
-struct ServicesListModelPrivate;
 
 /**
  * @brief The ServicesListModel class wraps a list of services

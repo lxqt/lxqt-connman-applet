@@ -40,17 +40,34 @@ typedef QList<ObjectProperties> ObjectPropertiesList;
 Q_DECLARE_METATYPE(ObjectProperties)
 Q_DECLARE_METATYPE(ObjectPropertiesList)
 
-void registerDbusTypes();
-QDebug operator<<(QDebug debug, const QDBusObjectPath &path);
+extern bool dbus_types_registered;
 
 
+class ConnmanObject : public QDBusAbstractInterface, public QVariantMap
+{
+    Q_OBJECT
 
+public:
+    ConnmanObject(const QString& path, const char* interface, QObject* parent = 0) :
+        QDBusAbstractInterface("net.connman", path, interface, QDBusConnection::systemBus(), parent),
+        QVariantMap() {}
 
-// Debugging
+Q_SIGNALS:
+   void PropertyChanged(const QString& name, const QDBusVariant& newValue);
+};
 
-void show(const ObjectPropertiesList& opl);
+class ConnmanManager : public ConnmanObject
+{
+    Q_OBJECT
 
-void show(const QList<QDBusObjectPath>& paths);
+public:
+    ConnmanManager(QObject* parent = 0) : ConnmanObject("/", "net.connman.Manager", parent) {}
+
+Q_SIGNALS:
+    void TechnologyAdded(const QDBusObjectPath& object, const QVariantMap& properties);
+    void TechnologyRemoved(const QDBusObjectPath& object);
+    void ServicesChanged(ObjectPropertiesList added, const QList<QDBusObjectPath>& removed);
+};
 
 
 #endif // DBUS_TYPES_H

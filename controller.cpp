@@ -1,8 +1,8 @@
 #include <QDBusReply>
 #include "iconproducer.h"
 #include "agentadaptor.h"
+#include "dbus_types.h"
 #include "controller.h"
-
 
 Controller::Controller() :
     manager(),

@@ -4,7 +4,7 @@
 #include <QAbstractListModel>
 #include <QDBusInterface>
 #include <QVariantMap>
-#include "connmannobject.h"
+#include "dbus_types.h"
 
 struct TechnologiesListModelPrivate;
 
