@@ -51,7 +51,6 @@ Controller::Controller() :
     onServicesUpdated(GetServicesReply.value(), QList<QDBusObjectPath>());
 
     servicesWindow.setModel(&model);
-    servicesWindow.show();
 
     QMenu *menu = new QMenu();
     menu->addAction(tr("Services..."), &servicesWindow, SLOT(show()));
@@ -171,9 +170,16 @@ void Controller::onServicesUpdated(ObjectPropertiesList services, const QList<QD
     QList<QStandardItem*> newItems;
     int count = 0;
     for (const auto& op : services) {
-        count++;
         QString path = op.first.path();
         QVariantMap properties = op.second;
+
+        if ((!properties.contains("Name")) || properties["Name"].toString().isEmpty()) {
+            // This would be a hidden service. We leave them out as we don't (yet) have
+            // functionality to handle them
+            continue;
+        }
+
+        count++;
         QStandardItem* item = items[path];
         if (item == 0) {
             item = new QStandardItem();
