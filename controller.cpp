@@ -149,6 +149,7 @@ void Controller::addTechnology(const QDBusObjectPath& path, const QVariantMap& p
     connect(technology, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)),
                         SLOT(updateTechnology(const QString&, const QDBusVariant&)));
     item->setData(QVariant::fromValue(technology), Qt::UserRole);
+    item->setEditable(false);
     setTechnologyData(item);
     items[path.path()] = item;
     connectionTypesItem.appendRow(QList<QStandardItem*>({item}));
@@ -180,6 +181,7 @@ void Controller::updateServices(ObjectPropertiesList services, const QList<QDBus
                              SLOT(updateService(const QString&, const QDBusVariant&)));
             item->setData(QVariant::fromValue(service), Qt::UserRole);
             setServiceData(item);
+            item->setEditable(false);
             items[path] = item;
             newItems.append(item);
         }
