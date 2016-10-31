@@ -26,44 +26,45 @@ Controller::Controller() :
 
     connect(&manager,
             SIGNAL(TechnologyAdded(const QDBusObjectPath&, const QVariantMap&)),
-            SLOT(addTechnology(const QDBusObjectPath&, const QVariantMap&)));
+            SLOT(onTechnologyAdded(const QDBusObjectPath&, const QVariantMap&)));
 
     connect(&manager,
             SIGNAL(TechnologyRemoved(const QDBusObjectPath&)),
-            SLOT(removeTechnology(const QDBusObjectPath&)));
+            SLOT(onTechnologyRemoved(const QDBusObjectPath&)));
 
     connect(&manager,
             SIGNAL(ServicesChanged(ObjectPropertiesList, const QList<QDBusObjectPath>&)),
-            SLOT(updateServices(const ObjectPropertiesList&,  const QList<QDBusObjectPath>&)));
+            SLOT(onServicesUpdated(const ObjectPropertiesList&,  const QList<QDBusObjectPath>&)));
 
     connect(&manager, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)), SLOT(updateTrayIcon()));
     connect(&IconProducer::instance(), SIGNAL(iconsChanged()), &model, SIGNAL(layoutChanged()));
     connect(&IconProducer::instance(), SIGNAL(iconsChanged()), SLOT(updateTrayIcon()));
 
-    connect(&servicesWindow, SIGNAL(activated(const QModelIndex&)), SLOT(activateItem(const QModelIndex&)));
+    connect(&servicesWindow, SIGNAL(activated(const QModelIndex&)), SLOT(onItemActivated(const QModelIndex&)));
 
     QDBusReply<ObjectPropertiesList> GetTechnologiesReply = manager.call("GetTechnologies");;
     for (ObjectProperties op : GetTechnologiesReply.value()) {
-        addTechnology(op.first, op.second);
+        onTechnologyAdded(op.first, op.second);
     }
 
     QDBusReply<ObjectPropertiesList> GetServicesReply = manager.call("GetServices");
-    updateServices(GetServicesReply.value(), QList<QDBusObjectPath>());
+    onServicesUpdated(GetServicesReply.value(), QList<QDBusObjectPath>());
 
     servicesWindow.setModel(&model);
+    servicesWindow.show();
 
     QMenu *menu = new QMenu();
     menu->addAction(tr("Services..."), &servicesWindow, SLOT(show()));
     menu->addAction(QIcon::fromTheme("help-about"), tr("About"), this, SLOT(about()));
     menu->addAction(QIcon::fromTheme("application-exit"), tr("Quit"), qApp, SLOT(quit()));
     connect(&trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-                       SLOT(trayIconActivated(QSystemTrayIcon::ActivationReason)));
+                       SLOT(onTrayIconActivated(QSystemTrayIcon::ActivationReason)));
     trayIcon.setContextMenu(menu);
     updateTrayIcon();
     trayIcon.show();
   }
 
-void Controller::setTechnologyData(QStandardItem* item)
+void Controller::updateTechnologyPresentationData(QStandardItem* item)
 {
     ConnmanObject& technology = *connmanObject(item);
     QString type = technology["Type"].toString();
@@ -95,7 +96,7 @@ void Controller::setTechnologyData(QStandardItem* item)
 
 }
 
-void Controller::setServiceData(QStandardItem* item)
+void Controller::updateServicePresentationData(QStandardItem* item)
 {
     ConnmanObject& service = *connmanObject(item);
     QString state = service["State"].toString();
@@ -142,26 +143,26 @@ void Controller::remove(const QString& path)
 }
 
 
-void Controller::addTechnology(const QDBusObjectPath& path, const QVariantMap& properties)
+void Controller::onTechnologyAdded(const QDBusObjectPath& path, const QVariantMap& properties)
 {
     QStandardItem* item = new QStandardItem();
     ConnmanObject* technology = new ConnmanObject(path.path(), "net.connman.Technology", properties);
     connect(technology, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)),
-                        SLOT(updateTechnology(const QString&, const QDBusVariant&)));
+                        SLOT(onTechnologyPropertyChanged(const QString&, const QDBusVariant&)));
     item->setData(QVariant::fromValue(technology), Qt::UserRole);
+    updateTechnologyPresentationData(item);
     item->setEditable(false);
-    setTechnologyData(item);
     items[path.path()] = item;
     connectionTypesItem.appendRow(QList<QStandardItem*>({item}));
 }
 
 
-void Controller::removeTechnology(const QDBusObjectPath& path)
+void Controller::onTechnologyRemoved(const QDBusObjectPath& path)
 {
     remove(path.path());
 }
 
-void Controller::updateServices(ObjectPropertiesList services, const QList<QDBusObjectPath>& removed)
+void Controller::onServicesUpdated(ObjectPropertiesList services, const QList<QDBusObjectPath>& removed)
 {
     for (const auto& path : removed) {
         remove(path.path());
@@ -178,9 +179,9 @@ void Controller::updateServices(ObjectPropertiesList services, const QList<QDBus
             item = new QStandardItem();
             ConnmanObject* service = new ConnmanObject(path, "net.connman.Service", properties);
             connect(service, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)),
-                             SLOT(updateService(const QString&, const QDBusVariant&)));
+                             SLOT(onServicePropertyChanged(const QString&, const QDBusVariant&)));
             item->setData(QVariant::fromValue(service), Qt::UserRole);
-            setServiceData(item);
+            updateServicePresentationData(item);
             item->setEditable(false);
             items[path] = item;
             newItems.append(item);
@@ -193,25 +194,25 @@ void Controller::updateServices(ObjectPropertiesList services, const QList<QDBus
     }
 }
 
-void Controller::updateTechnology(const QString& name, const QDBusVariant& newValue)
+void Controller::onTechnologyPropertyChanged(const QString& name, const QDBusVariant& newValue)
 {
     QString path = dynamic_cast<ConnmanObject*>(sender())->path();
     if (items.contains(path)) {
         connmanObject(items[path])->insert(name, newValue.variant());
-        setTechnologyData(items[path]);
+        updateTechnologyPresentationData(items[path]);
     }
 }
 
-void Controller::updateService(const QString& name, const QDBusVariant& newValue)
+void Controller::onServicePropertyChanged(const QString& name, const QDBusVariant& newValue)
 {
     QString path = dynamic_cast<ConnmanObject*>(sender())->path();
     if (items.contains(path)) {
         connmanObject(items[path])->insert(name, newValue.variant());
-        setServiceData(items[path]);
+        updateServicePresentationData(items[path]);
     }
 }
 
-void Controller::activateItem(const QModelIndex& index)
+void Controller::onItemActivated(const QModelIndex& index)
 {
     ConnmanObject* connmanObject = index.data(Qt::UserRole).value<ConnmanObject*>();
     if (connmanObject != 0) {
@@ -255,7 +256,7 @@ void Controller::updateTrayIcon()
 
 }
 
-void Controller::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
+void Controller::onTrayIconActivated(QSystemTrayIcon::ActivationReason reason)
 {
     servicesWindow.show();
 }

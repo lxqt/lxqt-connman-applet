@@ -4,8 +4,6 @@
 #include <QApplication>
 #include <QSystemTrayIcon>
 #include <QStandardItemModel>
-//#include "technologieslistmodel.h"
-//#include "serviceslistmodel.h"
 #include "dbus_types.h"
 #include "serviceswindow.h"
 #include "agent.h"
@@ -17,9 +15,12 @@ public:
     Controller();
 
 private:
+    void updateTechnologyPresentationData(QStandardItem* item);
+    void updateServicePresentationData(QStandardItem* item);
+    ConnmanObject* connmanObject(QStandardItem* item);
+    void remove(const QString& path);
+
     ConnmanManager manager;
-    //TechnologiesListModel technologiesListModel;
-    //ServicesListModel servicesListModel;
     Agent agent;
     QStandardItemModel model;
     ServicesWindow servicesWindow;
@@ -29,20 +30,15 @@ private:
     QStandardItem servicesItem;
     QMap<QString, QStandardItem*> items;
 
-    void setTechnologyData(QStandardItem* item);
-    void setServiceData(QStandardItem* item);
-    ConnmanObject* connmanObject(QStandardItem* item);
-    void remove(const QString& path);
-
 private slots:
-    void addTechnology(const QDBusObjectPath& path, const QVariantMap& properties);
-    void removeTechnology(const QDBusObjectPath& path);
-    void updateServices(ObjectPropertiesList services, const QList<QDBusObjectPath>& remove);
-    void updateTechnology(const QString& name, const QDBusVariant& newValue);
-    void updateService(const QString& name, const QDBusVariant& newValue);
-    void activateItem(const QModelIndex& index);
+    void onTechnologyAdded(const QDBusObjectPath& path, const QVariantMap& properties);
+    void onTechnologyRemoved(const QDBusObjectPath& path);
+    void onServicesUpdated(ObjectPropertiesList services, const QList<QDBusObjectPath>& remove);
+    void onTechnologyPropertyChanged(const QString& name, const QDBusVariant& newValue);
+    void onServicePropertyChanged(const QString& name, const QDBusVariant& newValue);
+    void onItemActivated(const QModelIndex& index);
+    void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
     void updateTrayIcon();
-    void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
     void about();
 };
 
