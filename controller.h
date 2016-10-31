@@ -41,6 +41,9 @@ private slots:
     void updateTechnology(const QString& name, const QDBusVariant& newValue);
     void updateService(const QString& name, const QDBusVariant& newValue);
     void activateItem(const QModelIndex& index);
+    void updateTrayIcon();
+    void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
+    void about();
 };
 
 #endif // CONTROLLER_H

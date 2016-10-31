@@ -1,4 +1,6 @@
 #include <QDBusReply>
+#include <QMenu>
+#include <QMessageBox>
 #include "iconproducer.h"
 #include "agentadaptor.h"
 #include "dbus_types.h"
@@ -34,7 +36,9 @@ Controller::Controller() :
             SIGNAL(ServicesChanged(ObjectPropertiesList, const QList<QDBusObjectPath>&)),
             SLOT(updateServices(const ObjectPropertiesList&,  const QList<QDBusObjectPath>&)));
 
+    connect(&manager, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)), SLOT(updateTrayIcon()));
     connect(&IconProducer::instance(), SIGNAL(iconsChanged()), &model, SIGNAL(layoutChanged()));
+    connect(&IconProducer::instance(), SIGNAL(iconsChanged()), SLOT(updateTrayIcon()));
 
     connect(&servicesWindow, SIGNAL(activated(const QModelIndex&)), SLOT(activateItem(const QModelIndex&)));
 
@@ -47,8 +51,16 @@ Controller::Controller() :
     updateServices(GetServicesReply.value(), QList<QDBusObjectPath>());
 
     servicesWindow.setModel(&model);
-    servicesWindow.show();
 
+    QMenu *menu = new QMenu();
+    menu->addAction(tr("Services..."), &servicesWindow, SLOT(show()));
+    menu->addAction(QIcon::fromTheme("help-about"), tr("About"), this, SLOT(about()));
+    menu->addAction(QIcon::fromTheme("application-exit"), tr("Quit"), qApp, SLOT(quit()));
+    connect(&trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+                       SLOT(trayIconActivated(QSystemTrayIcon::ActivationReason)));
+    trayIcon.setContextMenu(menu);
+    updateTrayIcon();
+    trayIcon.show();
   }
 
 void Controller::setTechnologyData(QStandardItem* item)
@@ -217,3 +229,48 @@ void Controller::activateItem(const QModelIndex& index)
     }
 }
 
+void Controller::updateTrayIcon()
+{
+    for (QStandardItem* item : items.values()) {
+        ConnmanObject* obj = connmanObject(item);
+        if (obj->path().startsWith("/net/connman/service")) {
+            QString state = obj->value("State").toString();
+            int signalStrength = obj->value("Strength").toInt();
+
+            if (state == "ready" || state == "online") {
+                if (signalStrength > 0) {
+                    trayIcon.setIcon(IconProducer::instance().wireless(signalStrength));
+                }
+                else {
+                    trayIcon.setIcon(IconProducer::instance().wiredConnected());
+                }
+                return;
+            }
+        }
+    }
+
+    trayIcon.setIcon(IconProducer::instance().disconnected());
+
+}
+
+void Controller::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    servicesWindow.show();
+}
+
+void Controller::about()
+{
+    QMessageBox::about(0,
+                       tr("About"),
+                       tr( "<p>"
+                           "  <b>LXQt Connman Client</b>"
+                           "</p>"
+                           "<p>"
+                           "Copyright 2014, 2015, 2016"
+                           "</p>"
+                           "<p>"
+                           "Christian Surlykke"
+                           "</p>"
+                           ));
+
+}
