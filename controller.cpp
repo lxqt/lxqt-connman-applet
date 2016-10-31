@@ -23,7 +23,7 @@ Controller::Controller() :
 
     model.insertRow(0, &connectionTypesItem);
     model.insertRow(1, &servicesItem);
-
+    model.setSortRole(Qt::UserRole + 1);
     connect(&manager,
             SIGNAL(TechnologyAdded(const QDBusObjectPath&, const QVariantMap&)),
             SLOT(onTechnologyAdded(const QDBusObjectPath&, const QVariantMap&)));
@@ -172,34 +172,35 @@ void Controller::onServicesUpdated(ObjectPropertiesList services, const QList<QD
     QList<QStandardItem*> newItems;
     int count = 0;
     for (const auto& op : services) {
+        count++;
         QString path = op.first.path();
         QVariantMap properties = op.second;
 
-        if ((!properties.contains("Name")) || properties["Name"].toString().isEmpty()) {
-            // This would be a hidden service. We leave them out as we don't (yet) have
-            // functionality to handle them
-            continue;
+        if (!items.contains(path)) {
+            if (properties.contains("Name") && !properties["Name"].toString().isEmpty()) {
+                ConnmanObject* service = new ConnmanObject(path, "net.connman.Service", properties);
+                connect(service, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)),
+                                 SLOT(onServicePropertyChanged(const QString&, const QDBusVariant&)));
+                items[path] = new QStandardItem();
+                items[path]->setData(QVariant::fromValue(service), Qt::UserRole);
+                items[path]->setEditable(false);
+                updateServicePresentationData(items[path]);
+                newItems.append(items[path]);
+            }
+            else {
+                // This would be a hidden service. We leave them out as we don't (yet) have
+                // functionality to handle them
+                continue;
+            }
         }
-
-        count++;
-        QStandardItem* item = items[path];
-        if (item == 0) {
-            item = new QStandardItem();
-            ConnmanObject* service = new ConnmanObject(path, "net.connman.Service", properties);
-            connect(service, SIGNAL(PropertyChanged(const QString&, const QDBusVariant&)),
-                             SLOT(onServicePropertyChanged(const QString&, const QDBusVariant&)));
-            item->setData(QVariant::fromValue(service), Qt::UserRole);
-            updateServicePresentationData(item);
-            item->setEditable(false);
-            items[path] = item;
-            newItems.append(item);
-        }
-        item->setData(count, Qt::UserRole + 1);
+        items[path]->setData(count, Qt::UserRole + 1);
     }
 
     if (newItems.size() > 0) {
         servicesItem.appendRows(newItems);
     }
+
+    servicesItem.sortChildren(0);
 }
 
 void Controller::onTechnologyPropertyChanged(const QString& name, const QDBusVariant& newValue)
