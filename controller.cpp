@@ -127,6 +127,8 @@ void Controller::updateServicePresentationData(QStandardItem* item)
         icon =  state == "offline" ? IconProducer::instance().disconnected() : IconProducer::instance().wiredConnected();
     }
     item->setData(icon, Qt::DecorationRole);
+
+    agent.setEntityName(service.path(), service["Name"].toString());
 }
 
 ConnmanObject* Controller::connmanObject(QStandardItem* item)
