@@ -4,8 +4,10 @@
 #include <QApplication>
 #include <QSystemTrayIcon>
 #include <QStandardItemModel>
+#include <QSharedPointer>
 #include "dbus_types.h"
 #include "serviceswindow.h"
+#include "itemwrapper.h"
 #include "agent.h"
 
 class Controller : public QObject
@@ -15,11 +17,6 @@ public:
     Controller();
 
 private:
-    void updateTechnologyPresentationData(QStandardItem* item);
-    void updateServicePresentationData(QStandardItem* item);
-    ConnmanObject* connmanObject(QStandardItem* item);
-    void remove(const QString& path);
-
     ConnmanManager manager;
     Agent agent;
     QStandardItemModel model;
@@ -28,14 +25,13 @@ private:
 
     QStandardItem connectionTypesItem;
     QStandardItem servicesItem;
-    QMap<QString, QStandardItem*> items;
+    QMap<QString, TechnologyItemWrapper*> technologyItemWrappers;
+    QMap<QString, ServiceItemWrapper*> serviceItemWrappers;
 
 private slots:
     void onTechnologyAdded(const QDBusObjectPath& path, const QVariantMap& properties);
     void onTechnologyRemoved(const QDBusObjectPath& path);
     void onServicesUpdated(ObjectPropertiesList services, const QList<QDBusObjectPath>& remove);
-    void onTechnologyPropertyChanged(const QString& name, const QDBusVariant& newValue);
-    void onServicePropertyChanged(const QString& name, const QDBusVariant& newValue);
     void onItemActivated(const QModelIndex& index);
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason);
     void updateTrayIcon();

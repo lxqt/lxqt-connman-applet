@@ -11,5 +11,9 @@ ConnmanObject::ConnmanObject(const QString& path, const char* interface, const Q
     QDBusAbstractInterface("net.connman", path, interface, QDBusConnection::systemBus(), 0),
     QVariantMap(properties)
 {
+    connect(this, &ConnmanObject::PropertyChanged,
+            [this](const QString& name, const QDBusVariant& newValue) {
+                insert(name, newValue.variant());
+            });
 }
 
