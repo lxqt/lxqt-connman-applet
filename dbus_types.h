@@ -57,8 +57,6 @@ protected slots:
    virtual void onPropertyChanged(const QString& name, const QDBusVariant& newValue) {}
 };
 
-Q_DECLARE_METATYPE(ConnmanObject*)
-
 class ConnmanManager : public ConnmanObject
 {
     Q_OBJECT

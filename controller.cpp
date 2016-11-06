@@ -23,7 +23,7 @@ Controller::Controller() :
 
     model.insertRow(0, &connectionTypesItem);
     model.insertRow(1, &servicesItem);
-    model.setSortRole(ItemWrapper::OrderRole);
+    model.setSortRole(ItemController::OrderRole);
     connect(&manager,
             SIGNAL(TechnologyAdded(const QDBusObjectPath&, const QVariantMap&)),
             SLOT(onTechnologyAdded(const QDBusObjectPath&, const QVariantMap&)));
@@ -68,7 +68,7 @@ void Controller::onTechnologyAdded(const QDBusObjectPath& path, const QVariantMa
     if (technologyItemWrappers.contains(path.path())) {
         return;
     }
-    TechnologyItemWrapper* item = new TechnologyItemWrapper(&connectionTypesItem, path.path(), properties);
+    TechnologyItemController* item = new TechnologyItemController(&connectionTypesItem, path.path(), properties);
     technologyItemWrappers[path.path()] = item;
     technologyItemWrappers[path.path()]->update();
 }
@@ -96,7 +96,7 @@ void Controller::onServicesUpdated(ObjectPropertiesList services, const QList<QD
 
         if (!serviceItemWrappers.contains(path)) {
             if (properties.contains("Name") && !properties["Name"].toString().isEmpty()) {
-                serviceItemWrappers[path] = new ServiceItemWrapper(&servicesItem, path, properties);
+                serviceItemWrappers[path] = new ServiceItemController(&servicesItem, path, properties);
                 serviceItemWrappers[path]->update();
             }
             else {
@@ -113,7 +113,7 @@ void Controller::onServicesUpdated(ObjectPropertiesList services, const QList<QD
 
 void Controller::onItemActivated(const QModelIndex& index)
 {
-    ItemWrapper *wrapper = model.itemFromIndex(index)->data(ItemWrapper::WrapperRole).value<ItemWrapper*>();
+    ItemController *wrapper = model.itemFromIndex(index)->data(ItemController::WrapperRole).value<ItemController*>();
     if (wrapper) {
         wrapper->activate();
     }
@@ -121,7 +121,7 @@ void Controller::onItemActivated(const QModelIndex& index)
 
 void Controller::updateTrayIcon()
 {
-    for (ServiceItemWrapper* item : serviceItemWrappers.values()) {
+    for (ServiceItemController* item : serviceItemWrappers.values()) {
         QString state = item->connmanObject->value("State").toString();
         int signalStrength = item->connmanObject->value("Strength").toInt();
 

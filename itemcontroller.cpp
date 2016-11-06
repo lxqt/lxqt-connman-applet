@@ -1,41 +1,41 @@
 #include <QDBusPendingCall>
 #include "iconproducer.h"
-#include "itemwrapper.h"
+#include "itemcontroller.h"
 
-ItemWrapper::ItemWrapper(QStandardItem* parent, const QString& path, const char* service, const QVariantMap& properties):
+ItemController::ItemController(QStandardItem* parent, const QString& path, const char* service, const QVariantMap& properties):
     QObject(),
     connmanObject(new ConnmanObject(path, service, properties)),
     item(new QStandardItem())
 {
-    connect(connmanObject, &ConnmanObject::PropertyChanged, this, &ItemWrapper::onPropertyChanged);
+    connect(connmanObject, &ConnmanObject::PropertyChanged, this, &ItemController::onPropertyChanged);
     parent->appendRow(item);
     item->setData(QVariant::fromValue(this), WrapperRole);
     item->setEditable(false);
 }
 
-ItemWrapper::~ItemWrapper()
+ItemController::~ItemController()
 {
     item->parent()->removeRow(item->row());
     connmanObject->deleteLater();
 }
 
-void ItemWrapper::setOrder(int order)
+void ItemController::setOrder(int order)
 {
    item->setData(order, OrderRole);
 }
 
-void ItemWrapper::onPropertyChanged()
+void ItemController::onPropertyChanged()
 {
     update();
 }
 
 
-ServiceItemWrapper::ServiceItemWrapper(QStandardItem* parent, const QString& path, const QVariantMap& properties) :
-    ItemWrapper(parent, path, "net.connman.Service", properties)
+ServiceItemController::ServiceItemController(QStandardItem* parent, const QString& path, const QVariantMap& properties) :
+    ItemController(parent, path, "net.connman.Service", properties)
 {
 }
 
-void ServiceItemWrapper::update()
+void ServiceItemController::update()
 {
     QString state = connmanObject->value("State").toString();
     QString type = connmanObject->value("Type").toString();
@@ -56,7 +56,7 @@ void ServiceItemWrapper::update()
     }
 }
 
-void ServiceItemWrapper::activate()
+void ServiceItemController::activate()
 {
     QString state = connmanObject->value("State").toString();
     if (state == "idle" || state == "failure") {
@@ -67,12 +67,12 @@ void ServiceItemWrapper::activate()
     }
 }
 
-TechnologyItemWrapper::TechnologyItemWrapper(QStandardItem* parent, const QString& path, const QVariantMap& properties) :
-    ItemWrapper(parent, path, "net.connman.Technology", properties)
+TechnologyItemController::TechnologyItemController(QStandardItem* parent, const QString& path, const QVariantMap& properties) :
+    ItemController(parent, path, "net.connman.Technology", properties)
 {
 }
 
-void TechnologyItemWrapper::update()
+void TechnologyItemController::update()
 {
     QString type = connmanObject->value("Type").toString();
     bool powered = connmanObject->value("Powered").toBool();
@@ -92,7 +92,7 @@ void TechnologyItemWrapper::update()
     item->setData(powered ? QVariant() : QColor("lightgrey"), Qt::ForegroundRole);
 }
 
-void TechnologyItemWrapper::activate()
+void TechnologyItemController::activate()
 {
     bool newPowered = !(connmanObject->value("Powered").toBool());
     connmanObject->asyncCall("SetProperty", QVariant("Powered"), QVariant::fromValue(QDBusVariant(newPowered)));

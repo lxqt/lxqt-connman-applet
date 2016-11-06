@@ -7,7 +7,7 @@
 #include <QSharedPointer>
 #include "dbus_types.h"
 #include "serviceswindow.h"
-#include "itemwrapper.h"
+#include "itemcontroller.h"
 #include "agent.h"
 
 class Controller : public QObject
@@ -25,8 +25,8 @@ private:
 
     QStandardItem connectionTypesItem;
     QStandardItem servicesItem;
-    QMap<QString, TechnologyItemWrapper*> technologyItemWrappers;
-    QMap<QString, ServiceItemWrapper*> serviceItemWrappers;
+    QMap<QString, TechnologyItemController*> technologyItemWrappers;
+    QMap<QString, ServiceItemController*> serviceItemWrappers;
 
 private slots:
     void onTechnologyAdded(const QDBusObjectPath& path, const QVariantMap& properties);
