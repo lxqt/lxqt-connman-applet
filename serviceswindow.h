@@ -16,13 +16,13 @@ public:
     explicit ServicesWindow(QWidget *parent = 0);
     ~ServicesWindow();
     void setModel(QAbstractItemModel* model);
+    void expandAll();
 
 signals:
     void activated(const QModelIndex& index);
 
 private:
     Ui::ServicesWindow *ui;
-
 };
 
 #endif // SERVICESWINDOW_H

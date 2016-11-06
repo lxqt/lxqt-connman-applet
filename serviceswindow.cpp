@@ -22,3 +22,8 @@ void ServicesWindow::setModel(QAbstractItemModel* model)
     ui->treeView->setModel(model);
     ui->treeView->expandAll();
 }
+
+void ServicesWindow::expandAll()
+{
+    ui->treeView->expandAll();
+}

@@ -70,6 +70,7 @@ void Controller::onTechnologyAdded(const QDBusObjectPath& path, const QVariantMa
     TechnologyItemController* item = new TechnologyItemController(&connectionTypesItem, path.path(), properties);
     technologyItemWrappers[path.path()] = item;
     technologyItemWrappers[path.path()]->update();
+    servicesWindow.expandAll();
 }
 
 
@@ -108,6 +109,7 @@ void Controller::onServicesUpdated(ObjectPropertiesList services, const QList<QD
     }
 
     servicesItem.sortChildren(0);
+    servicesWindow.expandAll();
 }
 
 void Controller::onItemActivated(const QModelIndex& index)

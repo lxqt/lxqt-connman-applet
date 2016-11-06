@@ -54,6 +54,18 @@ void ServiceItemController::update()
     else {
         item->setData(IconProducer::instance().wiredConnected(), Qt::DecorationRole);
     }
+
+    if (state == "association" || state == "configuration") {
+        if (item->hasChildren()) {
+            item->child(0, 0)->setData(state, Qt::DisplayRole);
+        }
+        else {
+            item->appendRow(new QStandardItem(state));
+        }
+    }
+    else while (item->hasChildren()) {
+        item->removeRow(0);
+    }
 }
 
 void ServiceItemController::activate()
