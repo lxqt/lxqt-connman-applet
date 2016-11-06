@@ -2,7 +2,7 @@
 #define ITEM_H
 
 #include <QStandardItem>
-#include "dbus_types.h"
+#include "connmanobject.h"
 
 class ItemController : public QObject
 {

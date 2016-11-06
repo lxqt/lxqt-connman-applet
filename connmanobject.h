@@ -22,11 +22,10 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
-#ifndef DBUS_TYPES_H
-#define DBUS_TYPES_H
+#ifndef CONNMANOBJECT_H
+#define CONNMANOBJECT_H
 
 #include <QMetaType>
-#include <QMap>
 #include <QVariantMap>
 #include <QDBusMetaType>
 #include <QDBusConnection>
@@ -43,18 +42,18 @@ Q_DECLARE_METATYPE(ObjectPropertiesList)
 extern bool dbus_types_registered;
 
 
-class ConnmanObject : public QDBusAbstractInterface, public QVariantMap
+class ConnmanObject : public QDBusAbstractInterface
 {
     Q_OBJECT
 
 public:
     ConnmanObject(const QString& path, const char* interface, const QVariantMap properties = QVariantMap());
+    QVariantMap properties;
+private slots:
+    void onPropertyChanged(const QString& name, const QDBusVariant& newValue);
 
 Q_SIGNALS:
    void PropertyChanged(const QString& name, const QDBusVariant& newValue);
-
-protected slots:
-   virtual void onPropertyChanged(const QString& name, const QDBusVariant& newValue) {}
 };
 
 class ConnmanManager : public ConnmanObject
@@ -62,7 +61,7 @@ class ConnmanManager : public ConnmanObject
     Q_OBJECT
 
 public:
-    ConnmanManager(QObject* parent = 0) : ConnmanObject("/", "net.connman.Manager") {}
+    ConnmanManager();
 
 Q_SIGNALS:
     void TechnologyAdded(const QDBusObjectPath& object, const QVariantMap& properties);
@@ -71,4 +70,4 @@ Q_SIGNALS:
 };
 
 
-#endif // DBUS_TYPES_H
+#endif // CONNMANOBJECT_H

@@ -25,7 +25,6 @@
 #include <QApplication>
 #include <QDebug>
 
-#include "dbus_types.h"
 #include "controller.h"
 #include "serviceswindow.h"
 

@@ -3,7 +3,6 @@
 #include <QMessageBox>
 #include "iconproducer.h"
 #include "agentadaptor.h"
-#include "dbus_types.h"
 #include "controller.h"
 
 
@@ -122,8 +121,8 @@ void Controller::onItemActivated(const QModelIndex& index)
 void Controller::updateTrayIcon()
 {
     for (ServiceItemController* item : serviceItemWrappers.values()) {
-        QString state = item->connmanObject->value("State").toString();
-        int signalStrength = item->connmanObject->value("Strength").toInt();
+        QString state = item->connmanObject->properties["State"].toString();
+        int signalStrength = item->connmanObject->properties["Strength"].toInt();
 
         if (state == "ready" || state == "online") {
             if (signalStrength > 0) {

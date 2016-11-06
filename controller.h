@@ -5,7 +5,7 @@
 #include <QSystemTrayIcon>
 #include <QStandardItemModel>
 #include <QSharedPointer>
-#include "dbus_types.h"
+#include "connmanobject.h"
 #include "serviceswindow.h"
 #include "itemcontroller.h"
 #include "agent.h"

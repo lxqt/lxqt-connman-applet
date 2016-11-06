@@ -37,10 +37,10 @@ ServiceItemController::ServiceItemController(QStandardItem* parent, const QStrin
 
 void ServiceItemController::update()
 {
-    QString state = connmanObject->value("State").toString();
-    QString type = connmanObject->value("Type").toString();
-    QString displayData = connmanObject->value("Name").toString();
-    int strength = connmanObject->value("Strength").toInt();
+    QString state = connmanObject->properties["State"].toString();
+    QString type = connmanObject->properties["Type"].toString();
+    QString displayData = connmanObject->properties["Name"].toString();
+    int strength = connmanObject->properties["Strength"].toInt();
 
     item->setData(state == "online" ? displayData + ' ' + QChar(0x2713) : displayData, Qt::DisplayRole);
     item->setData(state == "ready" || state == "online" ? QFont("", -1, QFont::Bold) : QVariant(), Qt::FontRole);
@@ -58,7 +58,7 @@ void ServiceItemController::update()
 
 void ServiceItemController::activate()
 {
-    QString state = connmanObject->value("State").toString();
+    QString state = connmanObject->properties["State"].toString();
     if (state == "idle" || state == "failure") {
         connmanObject->asyncCall("Connect");
     }
@@ -74,9 +74,9 @@ TechnologyItemController::TechnologyItemController(QStandardItem* parent, const 
 
 void TechnologyItemController::update()
 {
-    QString type = connmanObject->value("Type").toString();
-    bool powered = connmanObject->value("Powered").toBool();
-    QString name = connmanObject->value("Name").toString();
+    QString type = connmanObject->properties["Type"].toString();
+    bool powered = connmanObject->properties["Powered"].toBool();
+    QString name = connmanObject->properties["Name"].toString();
 
     item->setData(name, Qt::DisplayRole);
     if (type == "ethernet") {
@@ -94,7 +94,7 @@ void TechnologyItemController::update()
 
 void TechnologyItemController::activate()
 {
-    bool newPowered = !(connmanObject->value("Powered").toBool());
+    bool newPowered = !(connmanObject->properties["Powered"].toBool());
     connmanObject->asyncCall("SetProperty", QVariant("Powered"), QVariant::fromValue(QDBusVariant(newPowered)));
 }
 
