@@ -1,5 +1,6 @@
 #include <QDBusPendingCall>
 #include "iconproducer.h"
+#include "strings.h"
 #include "itemcontroller.h"
 
 ItemController::ItemController(QStandardItem* parent, const QString& path, const char* service, const QVariantMap& properties):
@@ -39,10 +40,10 @@ void ServiceItemController::update()
 {
     QString state = connmanObject->properties["State"].toString();
     QString type = connmanObject->properties["Type"].toString();
-    QString displayData = connmanObject->properties["Name"].toString();
+    QString name = connmanObject->properties["Name"].toString();
     int strength = connmanObject->properties["Strength"].toInt();
 
-    item->setData(state == "online" ? displayData + ' ' + QChar(0x2713) : displayData, Qt::DisplayRole);
+    item->setData(state == "online" ? name + ' ' + QChar(0x2713) : name, Qt::DisplayRole);
     item->setData(state == "ready" || state == "online" ? QFont("", -1, QFont::Bold) : QVariant(), Qt::FontRole);
 
     if (type == "wifi") {
@@ -57,10 +58,13 @@ void ServiceItemController::update()
 
     if (state == "association" || state == "configuration") {
         if (item->hasChildren()) {
-            item->child(0, 0)->setData(state, Qt::DisplayRole);
+            item->child(0, 0)->setData(string(state), Qt::DisplayRole);
         }
         else {
-            item->appendRow(new QStandardItem(state));
+            QStandardItem* stateItem = new QStandardItem(state);
+            stateItem->setData(IconProducer::instance().blanc(), Qt::DecorationRole);
+            stateItem->setData(QFont("", -1, -1, true), Qt::FontRole);
+            item->appendRow(stateItem);
         }
     }
     else while (item->hasChildren()) {

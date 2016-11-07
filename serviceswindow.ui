@@ -16,6 +16,15 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTreeView" name="treeView">
+     <property name="styleSheet">
+      <string notr="true">::branch { background-color: white; }
+::item:selected  { 
+    background: transparent;
+    color: black; 
+    border: 1px solid black;
+    border-radius: 3px;
+}</string>
+     </property>
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>

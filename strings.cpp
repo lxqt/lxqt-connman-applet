@@ -52,6 +52,9 @@ QMap<QString, QString> buildMap() {
     map["auth-failed"] = QObject::tr("Authentication failed");
     map["invalid-key"] = QObject::tr("Invalid key");
 
+    map["configuration"] = QObject::tr("Configuration");
+    map["association"] = QObject::tr("Association");
+
 	return map;
 }
 
