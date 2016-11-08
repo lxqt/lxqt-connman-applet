@@ -25,7 +25,7 @@
 #include <QDebug>
 #include <QDBusReply>
 #include "controller.h"
-#include "dialog.h"
+#include "agentdialog.h"
 #include "agent.h"
 
 Agent::Agent() : QObject()
@@ -66,15 +66,15 @@ QVariantMap Agent::RequestInput(QDBusObjectPath servicePath, QVariantMap fields)
         return QVariantMap();
     }
 
-    Dialog infoDialog(serviceName, fields);
-    connect(this, SIGNAL(operationCanceled()), &infoDialog, SLOT(reject()));
+    AgentDialog agentDialog(serviceName, fields);
+    connect(this, SIGNAL(operationCanceled()), &agentDialog, SLOT(reject()));
 
-    if (Dialog::Rejected == infoDialog.exec())
+    if (AgentDialog::Rejected == agentDialog.exec())
     {
         sendErrorReply("net.connman.Agent.Error.Canceled", "Cancelled");
         return QVariantMap();
     }
-    return infoDialog.collectedInput();
+    return agentDialog.collectedInput();
 }
 
 QVariantMap Agent::RequestPeerAuthorization(QDBusObjectPath peerPath, QVariantMap fields)

@@ -22,32 +22,45 @@
  *
  * END_COMMON_COPYRIGHT_HEADER */
 
-#ifndef DIALOG_H
-#define DIALOG_H
+#include <QFormLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QDebug>
+#include "strings.h"
 
-#include <QDialog>
-#include <QString>
+#include "agentdialog.h"
 
-#include "ui_dialog.h"
+AgentDialog::AgentDialog(QString service, QVariantMap request, QWidget *parent) :
+    QDialog(parent), Ui::Dialog()
+{
+    setupUi(this);
+    headingLabel->setText(headingLabel->text().arg(service));
 
-class QLineEdit;
-
-namespace Ui {
-class Dialog;
+    foreach (QString key, request.keys())
+    {
+        QLabel *label = new QLabel(string(key), this);
+        QLineEdit *lineEdit = new QLineEdit(this);
+        inputFields[key] = lineEdit;
+        inputFieldsLayout->addRow(label, lineEdit);
+    }
 }
 
-class Dialog : public QDialog, Ui::Dialog
+AgentDialog::~AgentDialog()
 {
-    Q_OBJECT
+}
 
-public:
-    explicit Dialog(QString service, QVariantMap request, QWidget *parent = 0);
-    ~Dialog();
+QVariantMap AgentDialog::collectedInput()
+{
+    QVariantMap collected;
 
-    QVariantMap collectedInput();
+    foreach (QString key, inputFields.keys())
+    {
+        if (!inputFields[key]->text().trimmed().isEmpty())
+        {
+            collected[key] = inputFields[key]->text(); // FIXME Handle bytearrays
+        }
+    }
 
-private:
-    QMap<QString, QLineEdit*> inputFields;
-};
+    return collected;
+}
 
-#endif // DIALOG_H
