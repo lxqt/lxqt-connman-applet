@@ -28,6 +28,7 @@
 #include <QDebug>
 #include <QDBusContext>
 #include <QDBusObjectPath>
+class Controller;
 
 class Agent : public QObject, public QDBusContext
 {
@@ -35,7 +36,6 @@ class Agent : public QObject, public QDBusContext
 
 public:
     explicit Agent();
-    void setEntityName(const QString& path, const QString& name);
 
     void Release();
     void Cancel();
@@ -45,12 +45,10 @@ public:
     QVariantMap RequestInput(QDBusObjectPath serviceName, QVariantMap fields);
     QVariantMap RequestPeerAuthorization(QDBusObjectPath peerName, QVariantMap fields);
 
+    QMap<QString, QString> serviceNames;
+
 signals:
     void operationCanceled();
-
-private:
-    QString entityName(QDBusObjectPath entityPath);
-    QMap<QString, QString> entityNames;
 
 };
 

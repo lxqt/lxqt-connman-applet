@@ -17,16 +17,16 @@ public:
     Controller();
 
 private:
+    QStandardItemModel model;
+    QStandardItem* technologyItemsParent;
+    QStandardItem* serviceItemsParent;
+    QMap<QString, TechnologyItemController*> technologyItemControllers;
+    QMap<QString, ServiceItemController*> serviceItemControllers;
+
     ConnmanManager manager;
     Agent agent;
-    QStandardItemModel model;
     ServicesWindow servicesWindow;
     QSystemTrayIcon trayIcon;
-
-    QStandardItem connectionTypesItem;
-    QStandardItem servicesItem;
-    QMap<QString, TechnologyItemController*> technologyItemWrappers;
-    QMap<QString, ServiceItemController*> serviceItemWrappers;
 
 private slots:
     void onTechnologyAdded(const QDBusObjectPath& path, const QVariantMap& properties);

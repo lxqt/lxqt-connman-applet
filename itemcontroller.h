@@ -2,6 +2,7 @@
 #define ITEM_H
 
 #include <QStandardItem>
+#include "agent.h"
 #include "connmanobject.h"
 
 class ItemController : public QObject
@@ -22,8 +23,12 @@ public:
     void setOrder(int order);
     ConnmanObject* connmanObject;
     QStandardItem* item;
+
+signals:
+    void entityNamed(const QString& path, const QString& newName);
+
 private slots:
-    virtual void onPropertyChanged();
+    virtual void onPropertyChanged(const QString& propertyName, const QDBusVariant& newValue);
 };
 
 Q_DECLARE_METATYPE(ItemController*)

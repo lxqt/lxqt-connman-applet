@@ -7,21 +7,24 @@
 
 
 Controller::Controller() :
+    QObject(),
+    model(),
+    technologyItemsParent(new QStandardItem("Connection types")),
+    serviceItemsParent(new QStandardItem("Services")),
+    technologyItemControllers(),
+    serviceItemControllers(),
     manager(),
     agent(),
-    model(),
     servicesWindow(),
-    trayIcon(),
-    connectionTypesItem("Connection types"),
-    servicesItem("Services")
+    trayIcon()
 {
     QDBusObjectPath agentPath("/org/lxqt/lxqt_connman_agent");
     new AgentAdaptor(&agent);
     QDBusConnection::systemBus().registerObject(agentPath.path(), &agent);
     manager.call("RegisterAgent", QVariant::fromValue(agentPath));
 
-    model.insertRow(0, &connectionTypesItem);
-    model.insertRow(1, &servicesItem);
+    model.insertRow(0, technologyItemsParent);
+    model.insertRow(1, serviceItemsParent);
     model.setSortRole(ItemController::OrderRole);
     connect(&manager,
             SIGNAL(TechnologyAdded(const QDBusObjectPath&, const QVariantMap&)),
@@ -60,32 +63,32 @@ Controller::Controller() :
     trayIcon.setContextMenu(menu);
     updateTrayIcon();
     trayIcon.show();
-  }
+}
 
 void Controller::onTechnologyAdded(const QDBusObjectPath& path, const QVariantMap& properties)
 {
-    if (technologyItemWrappers.contains(path.path())) {
+    if (technologyItemControllers.contains(path.path())) {
         return;
     }
-    TechnologyItemController* item = new TechnologyItemController(&connectionTypesItem, path.path(), properties);
-    technologyItemWrappers[path.path()] = item;
-    technologyItemWrappers[path.path()]->update();
+    TechnologyItemController* item = new TechnologyItemController(technologyItemsParent, path.path(), properties);
+    technologyItemControllers[path.path()] = item;
+    technologyItemControllers[path.path()]->update();
     servicesWindow.expandAll();
 }
 
 
 void Controller::onTechnologyRemoved(const QDBusObjectPath& path)
 {
-    if (technologyItemWrappers.contains(path.path())) {
-        technologyItemWrappers.take(path.path())->deleteLater();
+    if (technologyItemControllers.contains(path.path())) {
+        technologyItemControllers.take(path.path())->deleteLater();
     }
 }
 
 void Controller::onServicesUpdated(ObjectPropertiesList services, const QList<QDBusObjectPath>& removed)
 {
     for (const auto& path : removed) {
-        if (serviceItemWrappers.contains(path.path())) {
-            serviceItemWrappers.take(path.path())->deleteLater();
+        if (serviceItemControllers.contains(path.path())) {
+            serviceItemControllers.take(path.path())->deleteLater();
         }
     }
 
@@ -94,10 +97,11 @@ void Controller::onServicesUpdated(ObjectPropertiesList services, const QList<QD
         QString path = op.first.path();
         QVariantMap properties = op.second;
 
-        if (!serviceItemWrappers.contains(path)) {
+        if (!serviceItemControllers.contains(path)) {
             if (properties.contains("Name") && !properties["Name"].toString().isEmpty()) {
-                serviceItemWrappers[path] = new ServiceItemController(&servicesItem, path, properties);
-                serviceItemWrappers[path]->update();
+                serviceItemControllers[path] = new ServiceItemController(serviceItemsParent, path, properties);
+                serviceItemControllers[path]->update();
+                agent.serviceNames[path] = properties["Name"].toString();
             }
             else {
                 // This would be a hidden essid. We leave them out as we don't (yet) have
@@ -105,10 +109,10 @@ void Controller::onServicesUpdated(ObjectPropertiesList services, const QList<QD
                 continue;
             }
         }
-        serviceItemWrappers[path]->setOrder(count++);
+        serviceItemControllers[path]->setOrder(count++);
     }
 
-    servicesItem.sortChildren(0);
+    serviceItemsParent->sortChildren(0);
     servicesWindow.expandAll();
 }
 
@@ -122,7 +126,7 @@ void Controller::onItemActivated(const QModelIndex& index)
 
 void Controller::updateTrayIcon()
 {
-    for (ServiceItemController* item : serviceItemWrappers.values()) {
+    for (ServiceItemController* item : serviceItemControllers.values()) {
         QString state = item->connmanObject->properties["State"].toString();
         int signalStrength = item->connmanObject->properties["Strength"].toInt();
 

@@ -25,7 +25,7 @@ void ItemController::setOrder(int order)
    item->setData(order, OrderRole);
 }
 
-void ItemController::onPropertyChanged()
+void ItemController::onPropertyChanged(const QString& propertyName, const QDBusVariant& newValue)
 {
     update();
 }
@@ -61,7 +61,7 @@ void ServiceItemController::update()
             item->child(0, 0)->setData(string(state), Qt::DisplayRole);
         }
         else {
-            QStandardItem* stateItem = new QStandardItem(state);
+            QStandardItem* stateItem = new QStandardItem(string(state));
             stateItem->setData(IconProducer::instance().blanc(), Qt::DecorationRole);
             stateItem->setData(QFont("", -1, -1, true), Qt::FontRole);
             item->appendRow(stateItem);

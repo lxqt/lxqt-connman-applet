@@ -24,22 +24,12 @@
 
 #include <QDebug>
 #include <QDBusReply>
-
-#include "agent.h"
+#include "controller.h"
 #include "dialog.h"
+#include "agent.h"
 
-Agent::Agent() : QObject(), entityNames()
+Agent::Agent() : QObject()
 {
-}
-
-void Agent::setEntityName(const QString& path, const QString& name)
-{
-    entityNames[path] = name;
-}
-
-QString Agent::entityName(QDBusObjectPath entityPath)
-{
-    return entityNames.contains(entityPath.path()) ? entityNames.value(entityPath.path()) : entityPath.path();
 }
 
 void Agent::Release()
@@ -69,7 +59,7 @@ void Agent::RequestBrowser(QDBusObjectPath servicePath, QString url)
 
 QVariantMap Agent::RequestInput(QDBusObjectPath servicePath, QVariantMap fields)
 {
-    QString serviceName = entityName(servicePath);
+    QString serviceName = serviceNames.value(servicePath.path(), servicePath.path());
     if (serviceName.isEmpty())
     {
         sendErrorReply("net.connman.Agent.Error.Canceled", "Unknown service");
@@ -91,3 +81,4 @@ QVariantMap Agent::RequestPeerAuthorization(QDBusObjectPath peerPath, QVariantMa
 {
     return QVariantMap(); // FIXME
 }
+
