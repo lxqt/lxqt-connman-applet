@@ -26,7 +26,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QDebug>
-#include "strings.h"
+#include "appletstrings.h"
 
 #include "agentdialog.h"
 
