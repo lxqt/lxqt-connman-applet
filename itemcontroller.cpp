@@ -1,6 +1,6 @@
 #include <QDBusPendingCall>
 #include "iconproducer.h"
-#include "strings.h"
+#include "appletstrings.h"
 #include "itemcontroller.h"
 
 ItemController::ItemController(QStandardItem* parent, const QString& path, const char* service, const QVariantMap& properties):
