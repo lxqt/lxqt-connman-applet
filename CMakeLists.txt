@@ -66,11 +66,9 @@ add_executable(${PROJECT_NAME}
    ${QM_LOADER}
 )
 
-qt5_use_modules(lxqt-connman-applet Core Widgets DBus)
-
-
 target_link_libraries(${PROJECT_NAME} 
                       lxqt
+                      Qt5::Core
                       Qt5::Widgets 
                       Qt5::DBus 
                       Qt5::Svg)
