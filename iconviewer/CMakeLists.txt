@@ -36,11 +36,9 @@ add_executable(${PROJECT_NAME}
    ${QRCS_GENERATED}
 )
 
-qt5_use_modules(icon-viewer Core Widgets)
-
-
 target_link_libraries(${PROJECT_NAME} 
                       lxqt
+                      Qt5::Core
                       Qt5::Widgets 
                       Qt5::Svg)
 
