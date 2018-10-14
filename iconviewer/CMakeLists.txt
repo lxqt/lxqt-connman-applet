@@ -1,5 +1,4 @@
 set(PROJECT_NAME icon-viewer)
-cmake_minimum_required( VERSION 3.0.2 )
 set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS}")
 
 project(${PROJECT_NAME})
@@ -7,12 +6,6 @@ project(${PROJECT_NAME})
 find_package(lxqt REQUIRED QUIET)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Svg REQUIRED)
-
-
-if(NOT CMAKE_BUILD_TYPE)
-    set( CMAKE_BUILD_TYPE Debug )
-endif (NOT CMAKE_BUILD_TYPE)
-
 
 file(GLOB SRCS *.cpp *ui ../iconproducer.cpp)
 
@@ -36,10 +29,10 @@ add_executable(${PROJECT_NAME}
    ${QRCS_GENERATED}
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
                       lxqt
                       Qt5::Core
-                      Qt5::Widgets 
+                      Qt5::Widgets
                       Qt5::Svg)
 
 
