@@ -1,22 +1,19 @@
-set(PROJECT_NAME lxqt-connman-applet)
-cmake_minimum_required( VERSION 3.0.2 )
-set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS}")
+project(lxqt-connman-applet)
+# CMP0000 - A minimum required CMake version must be specified.
+# Note that the command invocation must appear in the CMakeLists.txt
+# file itself; a call in an included file is not sufficient.
+cmake_minimum_required(VERSION 3.6.2 FATAL_ERROR)
 
-project(${PROJECT_NAME})
+set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS}")
 
 add_subdirectory(iconviewer)
 
-find_package(lxqt REQUIRED QUIET)
-find_package(Qt5Xdg REQUIRED QUIET)
+find_package(lxqt REQUIRED)
+find_package(Qt5Xdg REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5DBus REQUIRED)
 find_package(Qt5Svg REQUIRED)
-find_package(Qt5LinguistTools REQUIRED QUIET)
-
-
-if(NOT CMAKE_BUILD_TYPE)
-    set( CMAKE_BUILD_TYPE Debug )
-endif (NOT CMAKE_BUILD_TYPE)
+find_package(Qt5LinguistTools REQUIRED)
 
 
 file(GLOB SRCS *.cpp clickableframe.h *.xml *.qrc *ui)
@@ -66,11 +63,11 @@ add_executable(${PROJECT_NAME}
    ${QM_LOADER}
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
                       lxqt
                       Qt5::Core
-                      Qt5::Widgets 
-                      Qt5::DBus 
+                      Qt5::Widgets
+                      Qt5::DBus
                       Qt5::Svg)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
