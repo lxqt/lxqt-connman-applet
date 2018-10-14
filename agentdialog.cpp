@@ -36,7 +36,7 @@ AgentDialog::AgentDialog(QString service, QVariantMap request, QWidget *parent) 
     setupUi(this);
     headingLabel->setText(headingLabel->text().arg(service));
 
-    foreach (QString key, request.keys())
+    for (const QString key : request.keys())
     {
         QLabel *label = new QLabel(string(key), this);
         QLineEdit *lineEdit = new QLineEdit(this);
@@ -53,7 +53,7 @@ QVariantMap AgentDialog::collectedInput()
 {
     QVariantMap collected;
 
-    foreach (QString key, inputFields.keys())
+    for (const QString key :  inputFields.keys())
     {
         if (!inputFields[key]->text().trimmed().isEmpty())
         {
