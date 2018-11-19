@@ -1,11 +1,10 @@
+cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
+# CMP0000: Call the cmake_minimum_required() command at the beginning of the top-level
+# CMakeLists.txt file even before calling the project() command.
+# The cmake_minimum_required(VERSION) command implicitly invokes the cmake_policy(VERSION)
+# command to specify that the current project code is written for the given range of CMake
+# versions.
 project(lxqt-connman-applet)
-# CMP0000 - A minimum required CMake version must be specified.
-# Note that the command invocation must appear in the CMakeLists.txt
-# file itself; a call in an included file is not sufficient.
-cmake_minimum_required(VERSION 3.6.2 FATAL_ERROR)
-
-set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS}")
-
 add_subdirectory(iconviewer)
 
 find_package(lxqt REQUIRED)
@@ -15,15 +14,15 @@ find_package(Qt5DBus REQUIRED)
 find_package(Qt5Svg REQUIRED)
 find_package(Qt5LinguistTools REQUIRED)
 
+include(LXQtPreventInSourceBuilds)
+include(LXQtCompilerSettings NO_POLICY_SCOPE)
+include(LXQtTranslate)
 
 file(GLOB SRCS *.cpp clickableframe.h *.xml *.qrc *ui)
 
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
-
-find_package(Qt5Widgets REQUIRED QUIET)
-find_package(Qt5DBus REQUIRED QUIET)
 
 qt5_add_resources(QRCS_GENERATED ${QRCS})
 
@@ -32,14 +31,10 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${QTXDG_INCLUDE_DIRS}
 )
-
 set(APP_SHARE_DIR share/lxqt/${PROJECT_NAME})
 
 # Translations **********************************
-include(LXQtTranslate)
-
 file(GLOB TRANSLATE_SOURCES *.ui *.h *.cpp)
-
 lxqt_translate_ts(QM_FILES
     UPDATE_TRANSLATIONS ${UPDATE_TRANSLATIONS}
     SOURCES
@@ -73,4 +68,3 @@ target_link_libraries(${PROJECT_NAME}
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 install(FILES   ${CONFIG_FILES}    DESTINATION ${APP_SHARE_DIR})
 install(FILES   ${DESKTOP_FILES}   DESTINATION ${LXQT_ETC_XDG_DIR}/autostart)
-
