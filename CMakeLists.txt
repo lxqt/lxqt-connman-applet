@@ -7,12 +7,16 @@ cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 project(lxqt-connman-applet)
 add_subdirectory(iconviewer)
 
-find_package(lxqt REQUIRED)
-find_package(Qt5Xdg REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5DBus REQUIRED)
-find_package(Qt5Svg REQUIRED)
-find_package(Qt5LinguistTools REQUIRED)
+# Minimum Versions
+set(LXQT_MINIMUM_VERSION "0.14.0")
+set(QT_MINIMUM_VERSION "5.7.1")
+
+find_package(Qt5Xdg ${QT_MINIMUM_VERSION} REQUIRED QUIET)
+find_package(Qt5Widgets ${QT_MINIMUM_VERSION} REQUIRED)
+find_package(Qt5DBus ${QT_MINIMUM_VERSION} REQUIRED)
+find_package(Qt5Svg ${QT_MINIMUM_VERSION} REQUIRED)
+find_package(Qt5LinguistTools ${QT_MINIMUM_VERSION} REQUIRED)
+find_package(lxqt ${LXQT_MINIMUM_VERSION} REQUIRED)
 
 include(LXQtPreventInSourceBuilds)
 include(LXQtCompilerSettings NO_POLICY_SCOPE)

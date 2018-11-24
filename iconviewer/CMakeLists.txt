@@ -1,18 +1,7 @@
 set(PROJECT_NAME icon-viewer)
-set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS}")
-
 project(${PROJECT_NAME})
 
-find_package(lxqt REQUIRED QUIET)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Svg REQUIRED)
-
 file(GLOB SRCS *.cpp *ui ../iconproducer.cpp)
-
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-
 
 qt5_add_resources(QRCS_GENERATED ${QRCS})
 
@@ -34,5 +23,3 @@ target_link_libraries(${PROJECT_NAME}
                       Qt5::Core
                       Qt5::Widgets
                       Qt5::Svg)
-
-
