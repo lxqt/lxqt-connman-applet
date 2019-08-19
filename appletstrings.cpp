@@ -34,7 +34,7 @@ QMap<QString, QString> buildMap() {
 	QMap<QString, QString> map;
 	
 	map["name"] = QObject::tr("name", "network name");
-	map["Identity"] = QObject::tr("Username");
+	map["Identity"] = QObject::tr("Identity");
 	map["Username"] = QObject::tr("Username");
 	map["Passphrase"] = QObject::tr("Passphrase");
 	map["PreviousPassphrase"] = QObject::tr("Previous passphrase");
