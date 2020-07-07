@@ -2,7 +2,9 @@
 Type=Application
 Name=LXQt ConnMan applet
 GenericName=Network Management
+GenericName[cs]=Správa síťových připojení
 Comment=LXQt panel applet to handle ConnMan
+Comment[cs]=Applet pro LXQt panel pro zacházení s nástrojem ConnMan
 Icon=preferences-system-network
 TryExec=lxqt-connman-applet
 Exec=lxqt-connman-applet
